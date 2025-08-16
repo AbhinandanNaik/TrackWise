@@ -1,0 +1,1 @@
+# Domain model notes (placeholder)

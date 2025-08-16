@@ -1,0 +1,1 @@
+# RabbitMQ queues & bindings (placeholder)

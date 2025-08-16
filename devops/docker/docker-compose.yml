@@ -1,0 +1,10 @@
+# Compose for infra placeholders only (no app build)
+services:
+  postgres:
+    image: postgres:16
+  redis:
+    image: redis:7
+  kafka:
+    image: bitnami/kafka:latest
+  zookeeper:
+    image: bitnami/zookeeper:latest
