@@ -1,4 +1,4 @@
-package com.company.trackwise.service.impl;
+package org.godigit.trackwise.service.impl;
 
 
 import lombok.RequiredArgsConstructor;
