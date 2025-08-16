@@ -23,63 +23,63 @@ import java.util.UUID;
 @Transactional
 public class CheckInOutServiceImpl implements CheckInOutService {
 
-  private final CheckInOutLogRepository checkInOutLogRepository;
-  private final AssetRepository assetRepository;
-  private final EmployeeRepository employeeRepository;
+    private final CheckInOutLogRepository checkInOutLogRepository;
+    private final AssetRepository assetRepository;
+    private final EmployeeRepository employeeRepository;
 
-  @Override
-  public CheckInOutLog checkoutAsset(UUID assetId, UUID employeeId) {
-    Asset asset = assetRepository.findById(assetId)
-      .orElseThrow(() -> new NotFoundException("Asset not found: " + assetId));
-    Employee emp = employeeRepository.findById(employeeId)
-      .orElseThrow(() -> new NotFoundException("Employee not found: " + employeeId));
+    @Override
+    public CheckInOutLog checkoutAsset(UUID assetId, UUID employeeId) {
+        Asset asset = assetRepository.findById(assetId)
+                .orElseThrow(() -> new NotFoundException("Asset not found: " + assetId));
+        Employee emp = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new NotFoundException("Employee not found: " + employeeId));
 
-    if (asset.getStatus() == AssetStatus.RETIRED) {
-      throw new IllegalStateException("Cannot checkout retired asset");
+        if (asset.getStatus() == AssetStatus.RETIRED) {
+            throw new IllegalStateException("Cannot checkout retired asset");
+        }
+
+        CheckInOutLog log = new CheckInOutLog();
+        log.setAsset(asset);
+        log.setEmployee(emp);
+        log.setCheckOutTime(Instant.now());
+        log = checkInOutLogRepository.save(log);
+
+        asset.setAssignedTo(emp);
+        asset.setStatus(AssetStatus.ASSIGNED);
+        assetRepository.save(asset);
+
+        return log;
     }
 
-    CheckInOutLog log = new CheckInOutLog();
-    log.setAsset(asset);
-    log.setEmployee(emp);
-    log.setCheckOutTime(Instant.now());
-    log = checkInOutLogRepository.save(log);
+    @Override
+    public CheckInOutLog checkinAsset(UUID assetId, UUID employeeId) {
+        Asset asset = assetRepository.findById(assetId)
+                .orElseThrow(() -> new NotFoundException("Asset not found: " + assetId));
+        Employee emp = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new NotFoundException("Employee not found: " + employeeId));
 
-    asset.setAssignedTo(emp);
-    asset.setStatus(AssetStatus.ASSIGNED);
-    assetRepository.save(asset);
+        CheckInOutLog log = new CheckInOutLog();
+        log.setAsset(asset);
+        log.setEmployee(emp);
+        log.setCheckInTime(Instant.now());
+        log = checkInOutLogRepository.save(log);
 
-    return log;
-  }
+        asset.setAssignedTo(null);
+        asset.setStatus(AssetStatus.AVAILABLE);
+        assetRepository.save(asset);
 
-  @Override
-  public CheckInOutLog checkinAsset(UUID assetId, UUID employeeId) {
-    Asset asset = assetRepository.findById(assetId)
-      .orElseThrow(() -> new NotFoundException("Asset not found: " + assetId));
-    Employee emp = employeeRepository.findById(employeeId)
-      .orElseThrow(() -> new NotFoundException("Employee not found: " + employeeId));
+        return log;
+    }
 
-    CheckInOutLog log = new CheckInOutLog();
-    log.setAsset(asset);
-    log.setEmployee(emp);
-    log.setCheckInTime(Instant.now());
-    log = checkInOutLogRepository.save(log);
+    @Override
+    @Transactional(readOnly = true)
+    public List<CheckInOutLog> historyByAsset(UUID assetId) {
+        return checkInOutLogRepository.findByAssetId(assetId);
+    }
 
-    asset.setAssignedTo(null);
-    asset.setStatus(AssetStatus.AVAILABLE);
-    assetRepository.save(asset);
-
-    return log;
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public List<CheckInOutLog> historyByAsset(UUID assetId) {
-    return checkInOutLogRepository.findByAssetId(assetId);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public List<CheckInOutLog> historyByEmployee(UUID employeeId) {
-    return checkInOutLogRepository.findByEmployeeId(employeeId);
-  }
+    @Override
+    @Transactional(readOnly = true)
+    public List<CheckInOutLog> historyByEmployee(UUID employeeId) {
+        return checkInOutLogRepository.findByEmployeeId(employeeId);
+    }
 }
