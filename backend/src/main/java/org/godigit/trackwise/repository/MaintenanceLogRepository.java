@@ -10,5 +10,5 @@ public interface MaintenanceLogRepository extends JpaRepository<MaintenanceLog, 
 
   List<MaintenanceLog> findByAssetId(UUID assetId);
 
-  List<MaintenanceLog> findByPerformedBy(String performedBy);
+
 }

@@ -28,7 +28,7 @@ public class WarrantyServiceImpl implements WarrantyService {
   @Override
   @Transactional(readOnly = true)
   public List<Warranty> findExpiringBetween(LocalDate from, LocalDate to) {
-    return warrantyRepository.findByExpiryDateBetween(from, to);
+    return warrantyRepository.findByEndDateBetween(from, to);
   }
 
   @Override

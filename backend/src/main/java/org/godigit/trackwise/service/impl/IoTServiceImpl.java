@@ -14,6 +14,7 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
@@ -62,7 +63,8 @@ public class IoTServiceImpl implements IoTService {
   @Override
   public void startSimulator() {
     if (simulatorRunning.compareAndSet(false, true)) {
-      simulatorFuture = taskScheduler.scheduleAtFixedRate(this::runSimulationStep, 5000);
+      // Correct: The time unit is now explicit and clear.
+      simulatorFuture = taskScheduler.scheduleAtFixedRate(this::runSimulationStep, Duration.ofMillis(5000));
       log.info("IoT Simulator started");
     }
   }

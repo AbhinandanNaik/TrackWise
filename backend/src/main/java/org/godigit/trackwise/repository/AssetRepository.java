@@ -4,6 +4,7 @@ import org.godigit.trackwise.model.Asset;
 import org.godigit.trackwise.model.AssetStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,14 +14,13 @@ public interface AssetRepository extends JpaRepository<Asset, UUID> {
 
   List<Asset> findByStatus(AssetStatus status);
 
-  List<Asset> findByCategory(String category);
+  List<Asset> findByCategoryName(String categoryName);
 
-  @Query("SELECT a FROM Asset a WHERE a.purchaseDate < CURRENT_DATE - 365")
+  @Query("SELECT a FROM Asset a WHERE a.purchaseDate < CURRENT_DATE - 1 YEAR")
   List<Asset> findAssetsOlderThanOneYear();
 
-  @Query("SELECT a FROM Asset a WHERE a.warrantyExpiryDate BETWEEN CURRENT_DATE AND CURRENT_DATE + 30")
-  List<Asset> findAssetsWithExpiringWarranty();
 
-  @Query("SELECT * FROM assets WHERE warranty_expiry_date BETWEEN :from AND :to;")
-  List<Asset> findByWarrantyExpiryDateBetween(LocalDate from, LocalDate to);
+  // Correct Query (in AssetRepository.java)
+  @Query("SELECT a FROM Asset a WHERE a.warrantyExpiryDate BETWEEN :from AND :to")
+  List<Asset> findByWarrantyExpiryDateBetween(@Param("from") LocalDate from, @Param("to") LocalDate to);
 }

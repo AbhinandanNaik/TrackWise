@@ -18,7 +18,9 @@ public class Asset extends BaseEntity {
   @JoinColumn(name = "category_id")
   private AssetCategory category;
 
+  // In Asset.java
   @Enumerated(EnumType.STRING)
+  @Column(columnDefinition = "asset_status")
   private AssetStatus status;
 
   private LocalDate warrantyExpiryDate;

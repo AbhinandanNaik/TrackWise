@@ -1,7 +1,8 @@
 package org.godigit.trackwise.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.model.Asset;
+import org.godigit.trackwise.dto.AssetRequest;
+import org.godigit.trackwise.dto.AssetResponse;
 import org.godigit.trackwise.model.AssetStatus;
 import org.godigit.trackwise.service.AssetService;
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -24,30 +26,27 @@ public class AssetController {
 
     // Create a new asset
     @PostMapping
-    public ResponseEntity<Asset> createAsset(@RequestBody Asset asset) {
-        Asset created = assetService.create(asset);
+    public ResponseEntity<AssetResponse> createAsset(@Valid @RequestBody AssetRequest dto) {
+        AssetResponse created = assetService.create(dto);
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     // Get asset by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Asset> getAsset(@PathVariable UUID id) {
-        Asset asset = assetService.getById(id);
-        return ResponseEntity.ok(asset);
+    public ResponseEntity<AssetResponse> getAsset(@PathVariable UUID id) {
+        return ResponseEntity.ok(assetService.getById(id));
     }
 
     // List assets with pagination
     @GetMapping
-    public ResponseEntity<Page<Asset>> listAssets(Pageable pageable) {
-        Page<Asset> assets = assetService.list(pageable);
-        return ResponseEntity.ok(assets);
+    public ResponseEntity<Page<AssetResponse>> listAssets(Pageable pageable) {
+        return ResponseEntity.ok(assetService.list(pageable));
     }
 
     // Update an asset
     @PutMapping("/{id}")
-    public ResponseEntity<Asset> updateAsset(@PathVariable UUID id, @RequestBody Asset asset) {
-        Asset updated = assetService.update(id, asset);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<AssetResponse> updateAsset(@PathVariable UUID id, @RequestBody AssetRequest dto) {
+        return ResponseEntity.ok(assetService.update(id, dto));
     }
 
     // Soft delete an asset
@@ -59,31 +58,27 @@ public class AssetController {
 
     // Assign an asset to an employee
     @PostMapping("/{assetId}/assign/{employeeId}")
-    public ResponseEntity<Asset> assignToEmployee(@PathVariable UUID assetId, @PathVariable UUID employeeId) {
-        Asset assigned = assetService.assignToEmployee(assetId, employeeId);
-        return ResponseEntity.ok(assigned);
+    public ResponseEntity<AssetResponse> assignToEmployee(@PathVariable UUID assetId, @PathVariable UUID employeeId) {
+        return ResponseEntity.ok(assetService.assignToEmployee(assetId, employeeId));
     }
 
     // Unassign an asset
     @PostMapping("/{assetId}/unassign")
-    public ResponseEntity<Asset> unassignAsset(@PathVariable UUID assetId) {
-        Asset unassigned = assetService.unassign(assetId);
-        return ResponseEntity.ok(unassigned);
+    public ResponseEntity<AssetResponse> unassignAsset(@PathVariable UUID assetId) {
+        return ResponseEntity.ok(assetService.unassign(assetId));
     }
 
     // Find assets by status
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Asset>> findByStatus(@PathVariable AssetStatus status) {
-        List<Asset> list = assetService.findByStatus(status);
-        return ResponseEntity.ok(list);
+    public ResponseEntity<List<AssetResponse>> findByStatus(@PathVariable AssetStatus status) {
+        return ResponseEntity.ok(assetService.findByStatus(status));
     }
 
     // Find assets with warranty expiring between dates
     @GetMapping("/warranty-expiring")
-    public ResponseEntity<List<Asset>> findWithWarrantyExpiringBetween(
+    public ResponseEntity<List<AssetResponse>> findWithWarrantyExpiringBetween(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        List<Asset> list = assetService.findWithWarrantyExpiringBetween(from, to);
-        return ResponseEntity.ok(list);
+        return ResponseEntity.ok(assetService.findWithWarrantyExpiringBetween(from, to));
     }
 }

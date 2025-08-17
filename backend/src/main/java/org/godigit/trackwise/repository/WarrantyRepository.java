@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface WarrantyRepository extends JpaRepository<Warranty, UUID> {
 
-  List<Warranty> findByExpiryDateBefore(LocalDate date);
 
-  List<Warranty> findByExpiryDateBetween(LocalDate startDate, LocalDate endDate);
+  // In WarrantyRepository.java - Correct
+  List<Warranty> findByEndDateBetween(LocalDate from, LocalDate to);
 }

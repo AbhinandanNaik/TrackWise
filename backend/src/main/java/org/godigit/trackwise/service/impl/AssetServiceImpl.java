@@ -1,15 +1,13 @@
 package org.godigit.trackwise.service.impl;
 
-import org.godigit.trackwise.exception.NotFoundException;
-import org.godigit.trackwise.model.Employee;
-import org.godigit.trackwise.service.AssetService;
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.model.Asset;
-import org.godigit.trackwise.model.AssetStatus;
-import org.godigit.trackwise.model.Warranty;
-import org.godigit.trackwise.repository.AssetRepository;
-import org.godigit.trackwise.repository.EmployeeRepository;
-import org.godigit.trackwise.repository.WarrantyRepository;
+import org.godigit.trackwise.dto.AssetRequest;
+import org.godigit.trackwise.dto.AssetResponse;
+import org.godigit.trackwise.exception.NotFoundException;
+import org.godigit.trackwise.mapper.AssetMapper;
+import org.godigit.trackwise.model.*;
+import org.godigit.trackwise.repository.*;
+import org.godigit.trackwise.service.AssetService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,100 +23,123 @@ import java.util.UUID;
 public class AssetServiceImpl implements AssetService {
 
   private final AssetRepository assetRepository;
+  private final AssetCategoryRepository categoryRepository;
   private final EmployeeRepository employeeRepository;
   private final WarrantyRepository warrantyRepository;
+  private final AssetMapper assetMapper;
 
   @Override
-  public Asset create(Asset asset) {
+  public AssetResponse create(AssetRequest request) {
+    AssetCategory category = (request.getCategoryId() != null)
+            ? categoryRepository.findById(request.getCategoryId())
+            .orElseThrow(() -> new NotFoundException("Category not found"))
+            : null;
+
+    Employee employee = (request.getEmployeeId() != null)
+            ? employeeRepository.findById(request.getEmployeeId())
+            .orElseThrow(() -> new NotFoundException("Employee not found"))
+            : null;
+
+    Asset asset = assetMapper.toEntity(request, category, employee);
+
     if (asset.getStatus() == null) {
       asset.setStatus(AssetStatus.AVAILABLE);
     }
+
     Asset saved = assetRepository.save(asset);
-    // persist warranty if present
-    Warranty w = saved.getWarranty();
-    if (w != null) {
-      w.setAsset(saved);
-      warrantyRepository.save(w);
+
+    if (request.getWarrantyExpiryDate() != null) {
+      Warranty warranty = new Warranty();
+      warranty.setAsset(saved);
+      warranty.setEndDate(request.getWarrantyExpiryDate());
+      warrantyRepository.save(warranty);
+      saved.setWarranty(warranty);
     }
-    return saved;
+
+    return assetMapper.toResponse(saved);
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public Asset getById(UUID id) {
-    return assetRepository.findById(id)
-      .orElseThrow(() -> new NotFoundException("Asset not found: " + id));
+  public AssetResponse getById(UUID id) {
+    Asset asset = assetRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Asset not found"));
+    return assetMapper.toResponse(asset);
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public Page<Asset> list(Pageable pageable) {
-    return assetRepository.findAll(pageable);
+  public Page<AssetResponse> list(Pageable pageable) {
+    return assetRepository.findAll(pageable).map(assetMapper::toResponse);
   }
 
   @Override
-  public Asset update(UUID id, Asset updated) {
-    Asset existing = getById(id);
-    // update fields (selective)
-    existing.setName(updated.getName());
-    existing.setSerialNumber(updated.getSerialNumber());
-    existing.setPurchaseDate(updated.getPurchaseDate());
-    existing.setStatus(updated.getStatus());
-    existing.setCategory(updated.getCategory());
-    if (updated.getWarranty() != null) {
-      Warranty w = existing.getWarranty();
-      if (w == null) {
-        w = updated.getWarranty();
-        w.setAsset(existing);
-        warrantyRepository.save(w);
-      } else {
-        w.setStartDate(updated.getWarranty().getStartDate());
-        w.setEndDate(updated.getWarranty().getEndDate());
-        w.setVendor(updated.getWarranty().getVendor());
-        warrantyRepository.save(w);
+  public AssetResponse update(UUID id, AssetRequest request) {
+    Asset asset = assetRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Asset not found"));
+
+    AssetCategory category = (request.getCategoryId() != null)
+            ? categoryRepository.findById(request.getCategoryId())
+            .orElseThrow(() -> new NotFoundException("Category not found"))
+            : null;
+
+    Employee employee = (request.getEmployeeId() != null)
+            ? employeeRepository.findById(request.getEmployeeId())
+            .orElseThrow(() -> new NotFoundException("Employee not found"))
+            : null;
+
+    assetMapper.updateEntity(asset, request, category, employee);
+
+    if (request.getWarrantyExpiryDate() != null) {
+      Warranty warranty = asset.getWarranty();
+      if (warranty == null) {
+        warranty = new Warranty();
+        warranty.setAsset(asset);
       }
+      warranty.setEndDate(request.getWarrantyExpiryDate());
+      warrantyRepository.save(warranty);
+      asset.setWarranty(warranty);
     }
-    return assetRepository.save(existing);
+
+    return assetMapper.toResponse(assetRepository.save(asset));
   }
 
   @Override
   public void delete(UUID id) {
-    Asset asset = getById(id);
-    // soft delete pattern: mark inactive instead of DB delete
-    asset.setStatus(AssetStatus.RETIRED);
-    assetRepository.save(asset);
+    Asset asset = assetRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Asset not found"));
+    assetRepository.delete(asset);
   }
 
   @Override
-  public Asset assignToEmployee(UUID assetId, UUID employeeId) {
-    Asset asset = getById(assetId);
-    if (asset.getStatus() == AssetStatus.RETIRED || asset.getStatus() == AssetStatus.UNDER_MAINTENANCE) {
-      throw new IllegalStateException("Asset cannot be assigned in its current state: " + asset.getStatus());
-    }
-    Employee emp = employeeRepository.findById(employeeId)
-      .orElseThrow(() -> new NotFoundException("Employee not found: " + employeeId));
-    asset.setAssignedTo(emp);
-    asset.setStatus(AssetStatus.ASSIGNED);
-    return assetRepository.save(asset);
+  public AssetResponse assignToEmployee(UUID assetId, UUID employeeId) {
+    Asset asset = assetRepository.findById(assetId)
+            .orElseThrow(() -> new NotFoundException("Asset not found"));
+    Employee employee = employeeRepository.findById(employeeId)
+            .orElseThrow(() -> new NotFoundException("Employee not found"));
+
+    asset.setAssignedTo(employee);
+    return assetMapper.toResponse(assetRepository.save(asset));
   }
 
   @Override
-  public Asset unassign(UUID assetId) {
-    Asset asset = getById(assetId);
+  public AssetResponse unassign(UUID assetId) {
+    Asset asset = assetRepository.findById(assetId)
+            .orElseThrow(() -> new NotFoundException("Asset not found"));
     asset.setAssignedTo(null);
-    asset.setStatus(AssetStatus.AVAILABLE);
-    return assetRepository.save(asset);
+    return assetMapper.toResponse(assetRepository.save(asset));
+  }
+
+
+  @Override
+  public List<AssetResponse> findByStatus(AssetStatus status) {
+    return assetRepository.findByStatus(status)
+            .stream().map(assetMapper::toResponse).toList();
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public List<Asset> findByStatus(AssetStatus status) {
-    return assetRepository.findByStatus(status);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public List<Asset> findWithWarrantyExpiringBetween(LocalDate from, LocalDate to) {
-    return assetRepository.findByWarrantyExpiryDateBetween(from, to);
+  public List<AssetResponse> findWithWarrantyExpiringBetween(LocalDate from, LocalDate to) {
+    return warrantyRepository.findByEndDateBetween(from, to)
+            .stream().map(Warranty::getAsset)
+            .map(assetMapper::toResponse)
+            .toList();
   }
 }
