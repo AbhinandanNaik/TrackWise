@@ -2,7 +2,11 @@ package org.godigit.trackwise.service.impl;
 
 
 import lombok.RequiredArgsConstructor;
+import org.godigit.trackwise.dto.EmailRequestDTO;
+import org.godigit.trackwise.dto.NotificationRequestDTO;
+import org.godigit.trackwise.dto.NotificationResponseDTO;
 import org.godigit.trackwise.exception.NotFoundException;
+import org.godigit.trackwise.mapper.NotificationMapper;
 import org.godigit.trackwise.model.Employee;
 import org.godigit.trackwise.model.Notification;
 import org.godigit.trackwise.repository.EmployeeRepository;
@@ -12,8 +16,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,22 +27,25 @@ public class NotificationServiceImpl implements NotificationService {
   private final JavaMailSender mailSender;
 
   @Override
-  public Notification createInAppNotification(UUID employeeId, String message) {
-    Employee e = employeeRepository.findById(employeeId)
-      .orElseThrow(() -> new NotFoundException("Employee not found: " + employeeId));
-    Notification n = new Notification();
-    n.setRecipient(e);
-    n.setMessage(message);
-    n.setRead(false);
-    return notificationRepository.save(n);
+  public NotificationResponseDTO createInAppNotification(NotificationRequestDTO request) {
+    Employee recipient = employeeRepository.findById(request.getRecipientId())
+            .orElseThrow(() -> new NotFoundException("Employee not found: " + request.getRecipientId()));
+
+    Notification notification = Notification.builder()
+            .recipient(recipient)
+            .message(request.getMessage())
+            .build(); // Defaults for read and createdAt are set in the entity
+
+    Notification saved = notificationRepository.save(notification);
+    return NotificationMapper.toResponseDTO(saved);
   }
 
   @Override
-  public void sendEmail(String to, String subject, String body) {
+  public void sendEmail(EmailRequestDTO request) {
     SimpleMailMessage msg = new SimpleMailMessage();
-    msg.setTo(to);
-    msg.setSubject(subject);
-    msg.setText(body);
+    msg.setTo(request.getTo());
+    msg.setSubject(request.getSubject());
+    msg.setText(request.getBody());
     mailSender.send(msg);
   }
 }

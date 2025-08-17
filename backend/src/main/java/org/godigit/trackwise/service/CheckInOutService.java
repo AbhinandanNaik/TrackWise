@@ -1,13 +1,20 @@
 package org.godigit.trackwise.service;
 
-import org.godigit.trackwise.model.CheckInOutLog;
+import org.godigit.trackwise.dto.CheckInOutRequestDTO; // Use DTOs
+import org.godigit.trackwise.dto.CheckInOutResponseDTO;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface CheckInOutService {
-  CheckInOutLog checkoutAsset(UUID assetId, UUID employeeId);
-  CheckInOutLog checkinAsset(UUID assetId, UUID employeeId);
-  List<CheckInOutLog> historyByAsset(UUID assetId);
-  List<CheckInOutLog> historyByEmployee(UUID employeeId);
+
+  // Use DTO for request to group parameters
+  CheckInOutResponseDTO checkoutAsset(CheckInOutRequestDTO request);
+
+  // Use DTO for request
+  CheckInOutResponseDTO checkinAsset(CheckInOutRequestDTO request);
+
+  List<CheckInOutResponseDTO> historyByAsset(UUID assetId);
+
+  List<CheckInOutResponseDTO> historyByEmployee(UUID employeeId);
 }

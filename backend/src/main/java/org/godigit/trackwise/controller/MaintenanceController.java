@@ -1,7 +1,8 @@
 package org.godigit.trackwise.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.model.MaintenanceLog;
+import org.godigit.trackwise.dto.MaintenanceRequestDTO;
+import org.godigit.trackwise.dto.MaintenanceResponseDTO;
 import org.godigit.trackwise.service.MaintenanceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,17 +20,17 @@ public class MaintenanceController {
 
     // Add a maintenance log to an asset
     @PostMapping("/{assetId}")
-    public ResponseEntity<MaintenanceLog> addMaintenance(
+    public ResponseEntity<MaintenanceResponseDTO> addMaintenance(
             @PathVariable UUID assetId,
-            @RequestBody MaintenanceLog log) {
-        MaintenanceLog saved = maintenanceService.addMaintenance(assetId, log);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+            @RequestBody MaintenanceRequestDTO request) {
+        MaintenanceResponseDTO savedDto = maintenanceService.addMaintenance(assetId, request);
+        return new ResponseEntity<>(savedDto, HttpStatus.CREATED);
     }
 
     // List all maintenance logs for a specific asset
     @GetMapping("/{assetId}")
-    public ResponseEntity<List<MaintenanceLog>> listByAsset(@PathVariable UUID assetId) {
-        List<MaintenanceLog> logs = maintenanceService.listByAsset(assetId);
+    public ResponseEntity<List<MaintenanceResponseDTO>> listByAsset(@PathVariable UUID assetId) {
+        List<MaintenanceResponseDTO> logs = maintenanceService.listByAsset(assetId);
         return ResponseEntity.ok(logs);
     }
 }

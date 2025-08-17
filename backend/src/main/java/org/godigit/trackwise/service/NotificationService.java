@@ -1,10 +1,10 @@
 package org.godigit.trackwise.service;
 
-import org.godigit.trackwise.model.Notification;
-
-import java.util.UUID;
+import org.godigit.trackwise.dto.EmailRequestDTO;
+import org.godigit.trackwise.dto.NotificationRequestDTO;
+import org.godigit.trackwise.dto.NotificationResponseDTO;
 
 public interface NotificationService {
-  Notification createInAppNotification(UUID userId, String message);
-  void sendEmail(String to, String subject, String body);
+  NotificationResponseDTO createInAppNotification(NotificationRequestDTO request);
+  void sendEmail(EmailRequestDTO request);
 }

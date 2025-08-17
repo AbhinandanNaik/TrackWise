@@ -1,9 +1,12 @@
 package org.godigit.trackwise.service.impl;
 
-
 import lombok.RequiredArgsConstructor;
+import org.godigit.trackwise.dto.EmployeeRequestDTO;
 import org.godigit.trackwise.exception.NotFoundException;
+import org.godigit.trackwise.mapper.EmployeeMapper;
+import org.godigit.trackwise.model.Department;
 import org.godigit.trackwise.model.Employee;
+import org.godigit.trackwise.repository.DepartmentRepository;
 import org.godigit.trackwise.repository.EmployeeRepository;
 import org.godigit.trackwise.service.EmployeeService;
 import org.springframework.data.domain.Page;
@@ -20,17 +23,24 @@ import java.util.UUID;
 public class EmployeeServiceImpl implements EmployeeService {
 
   private final EmployeeRepository employeeRepository;
+  private final DepartmentRepository departmentRepository; // ✅ needed to resolve dept
 
   @Override
-  public Employee create(Employee employee) {
-    return employeeRepository.save(employee);
+  public Employee create(EmployeeRequestDTO dto) {
+    Department dept = null;
+    if (dto.getDepartmentId() != null) {
+      dept = departmentRepository.findById(dto.getDepartmentId())
+              .orElseThrow(() -> new NotFoundException("Department not found: " + dto.getDepartmentId()));
+    }
+    Employee emp = EmployeeMapper.toEntity(dto, dept);
+    return employeeRepository.save(emp);
   }
 
   @Override
   @Transactional(readOnly = true)
   public Employee getById(UUID id) {
     return employeeRepository.findById(id)
-      .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
+            .orElseThrow(() -> new NotFoundException("Employee not found: " + id));
   }
 
   @Override
@@ -40,21 +50,28 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   @Override
-  public Employee update(UUID id, Employee updated) {
+  public Employee update(UUID id, EmployeeRequestDTO dto) {
     Employee existing = getById(id);
-    existing.setFirstName(updated.getFirstName());
-    existing.setLastName(updated.getLastName());
-    existing.setEmail(updated.getEmail());
-    existing.setPhone(updated.getPhone());
-    existing.setDepartment(updated.getDepartment());
+
+    Department dept = null;
+    if (dto.getDepartmentId() != null) {
+      dept = departmentRepository.findById(dto.getDepartmentId())
+              .orElseThrow(() -> new NotFoundException("Department not found: " + dto.getDepartmentId()));
+    }
+
+    existing.setFirstName(dto.getFirstName());
+    existing.setLastName(dto.getLastName());
+    existing.setEmail(dto.getEmail());
+    existing.setPhone(dto.getPhone());
+    existing.setDepartment(dept);
+
     return employeeRepository.save(existing);
   }
 
   @Override
   public void delete(UUID id) {
-    // Soft delete not implemented for employee here: mark active false if BaseEntity has active
     Employee emp = getById(id);
-    employeeRepository.delete(emp);
+    employeeRepository.delete(emp); // soft delete can be added later
   }
 
   @Override

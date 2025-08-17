@@ -1,7 +1,8 @@
 package org.godigit.trackwise.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.model.IoTData;
+import org.godigit.trackwise.dto.IoTDataRequestDTO;
+import org.godigit.trackwise.dto.IoTDataResponseDTO;
 import org.godigit.trackwise.service.IoTService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,22 +17,22 @@ public class IoTController {
 
     private final IoTService iotService;
 
-    // Ingest IoT data
+    // Ingest IoT data using the new DTO
     @PostMapping("/ingest")
-    public ResponseEntity<IoTData> ingestData(@RequestBody IoTData data) {
-        IoTData saved = iotService.ingest(data);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    public ResponseEntity<IoTDataResponseDTO> ingestData(@RequestBody IoTDataRequestDTO request) {
+        IoTDataResponseDTO savedDto = iotService.ingest(request);
+        return new ResponseEntity<>(savedDto, HttpStatus.CREATED);
     }
 
-    // Process sensor data for an asset
+    // Process sensor data for an asset (for simulation)
     @PostMapping("/process/{assetId}")
-    public ResponseEntity<Void> processSensorData(
+    public ResponseEntity<IoTDataResponseDTO> processSensorData(
             @PathVariable UUID assetId,
             @RequestParam Double temperature,
             @RequestParam Double batteryLevel,
             @RequestParam Boolean inUse) {
-        iotService.processSensorData(assetId, temperature, batteryLevel, inUse);
-        return ResponseEntity.ok().build();
+        IoTDataResponseDTO processedData = iotService.processSensorData(assetId, temperature, batteryLevel, inUse);
+        return ResponseEntity.ok(processedData);
     }
 
     // Start IoT simulator

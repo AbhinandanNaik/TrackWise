@@ -1,6 +1,9 @@
 package org.godigit.trackwise.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.godigit.trackwise.dto.EmployeeRequestDTO;
+import org.godigit.trackwise.dto.EmployeeResponseDTO;
+import org.godigit.trackwise.mapper.EmployeeMapper;
 import org.godigit.trackwise.model.Employee;
 import org.godigit.trackwise.service.EmployeeService;
 import org.springframework.data.domain.Page;
@@ -19,45 +22,49 @@ public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    // Create a new employee
+    // ✅ Create
     @PostMapping
-    public ResponseEntity<Employee> createEmployee(@RequestBody Employee employee) {
-        Employee created = employeeService.create(employee);
-        return new ResponseEntity<>(created, HttpStatus.CREATED);
+    public ResponseEntity<EmployeeResponseDTO> createEmployee(@RequestBody EmployeeRequestDTO requestDTO) {
+        Employee created = employeeService.create(requestDTO);
+        return new ResponseEntity<>(EmployeeMapper.toDto(created), HttpStatus.CREATED);
     }
 
-    // Get employee by ID
+    // ✅ Get by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployee(@PathVariable UUID id) {
+    public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable UUID id) {
         Employee employee = employeeService.getById(id);
-        return ResponseEntity.ok(employee);
+        return ResponseEntity.ok(EmployeeMapper.toDto(employee));
     }
 
-    // List employees with pagination
+    // ✅ List with pagination
     @GetMapping
-    public ResponseEntity<Page<Employee>> listEmployees(Pageable pageable) {
-        Page<Employee> employees = employeeService.list(pageable);
+    public ResponseEntity<Page<EmployeeResponseDTO>> listEmployees(Pageable pageable) {
+        Page<EmployeeResponseDTO> employees = employeeService.list(pageable)
+                .map(EmployeeMapper::toDto);
         return ResponseEntity.ok(employees);
     }
 
-    // Update an employee
+    // ✅ Update
     @PutMapping("/{id}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable UUID id, @RequestBody Employee employee) {
-        Employee updated = employeeService.update(id, employee);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable UUID id,
+                                                              @RequestBody EmployeeRequestDTO requestDTO) {
+        Employee updated = employeeService.update(id, requestDTO);
+        return ResponseEntity.ok(EmployeeMapper.toDto(updated));
     }
 
-    // Delete an employee
+    // ✅ Delete
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEmployee(@PathVariable UUID id) {
         employeeService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    // Find employee by email
+    // ✅ Find by email
     @GetMapping("/search")
-    public ResponseEntity<Optional<Employee>> findByEmail(@RequestParam String email) {
-        Optional<Employee> employee = employeeService.findByEmail(email);
-        return ResponseEntity.ok(employee);
+    public ResponseEntity<EmployeeResponseDTO> findByEmail(@RequestParam String email) {
+        Optional<Employee> employeeOpt = employeeService.findByEmail(email);
+        return employeeOpt
+                .map(employee -> ResponseEntity.ok(EmployeeMapper.toDto(employee)))
+                .orElse(ResponseEntity.notFound().build());
     }
 }

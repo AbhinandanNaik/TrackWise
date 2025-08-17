@@ -1,12 +1,13 @@
 package org.godigit.trackwise.service;
 
-import org.godigit.trackwise.model.IoTData;
+import org.godigit.trackwise.dto.IoTDataRequestDTO;
+import org.godigit.trackwise.dto.IoTDataResponseDTO;
 
 import java.util.UUID;
 
 public interface IoTService {
-  IoTData ingest(IoTData data); // store a single reading
-  void processSensorData(UUID assetId, Double temperature, Double batteryLevel, Boolean inUse); // convenience
-  void startSimulator(); // optional: kick off background simulator (enabled in dev)
+  IoTDataResponseDTO ingest(IoTDataRequestDTO request);
+  IoTDataResponseDTO processSensorData(UUID assetId, Double temperature, Double batteryLevel, Boolean inUse);
+  void startSimulator();
   void stopSimulator();
 }

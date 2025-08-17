@@ -2,7 +2,10 @@ package org.godigit.trackwise.service.impl;
 
 
 import lombok.RequiredArgsConstructor;
+import org.godigit.trackwise.dto.IoTDataRequestDTO;
+import org.godigit.trackwise.dto.IoTDataResponseDTO;
 import org.godigit.trackwise.exception.NotFoundException;
+import org.godigit.trackwise.mapper.IoTDataMapper;
 import org.godigit.trackwise.model.Asset;
 import org.godigit.trackwise.model.IoTData;
 import org.godigit.trackwise.repository.AssetRepository;
@@ -35,15 +38,32 @@ public class IoTServiceImpl implements IoTService {
   private final AtomicBoolean simulatorRunning = new AtomicBoolean(false);
 
   @Override
-  public IoTData ingest(IoTData data) {
+  public IoTDataResponseDTO ingest(IoTDataRequestDTO request) {
+    Asset asset = assetRepository.findById(request.getAssetId())
+            .orElseThrow(() -> new NotFoundException("Asset not found: " + request.getAssetId()));
+
+    IoTData data = new IoTData();
+    data.setAsset(asset);
+    data.setTemperature(request.getTemperature());
+    data.setBatteryLevel(request.getBatteryLevel());
+    data.setInUse(request.getInUse());
     data.setTimestamp(Instant.now());
-    return iotDataRepository.save(data);
+
+    IoTData savedData = iotDataRepository.save(data);
+
+    // Example business logic: if battery < 10% create an alert (hook notification)
+    if (request.getBatteryLevel() != null && request.getBatteryLevel() < 10.0) {
+      log.warn("Low battery for asset {}: {}%", asset.getId(), request.getBatteryLevel());
+      // TODO: Create notification/alert here
+    }
+
+    return IoTDataMapper.toResponseDTO(savedData);
   }
 
   @Override
-  public void processSensorData(UUID assetId, Double temperature, Double batteryLevel, Boolean inUse) {
+  public IoTDataResponseDTO processSensorData(UUID assetId, Double temperature, Double batteryLevel, Boolean inUse) {
     Asset asset = assetRepository.findById(assetId)
-      .orElseThrow(() -> new NotFoundException("Asset not found: " + assetId));
+            .orElseThrow(() -> new NotFoundException("Asset not found: " + assetId));
 
     IoTData d = new IoTData();
     d.setAsset(asset);
@@ -51,20 +71,22 @@ public class IoTServiceImpl implements IoTService {
     d.setBatteryLevel(batteryLevel);
     d.setInUse(inUse);
     d.setTimestamp(Instant.now());
-    iotDataRepository.save(d);
 
-    // Example business logic: if battery < 10% create an alert (hook notification)
+    IoTData savedData = iotDataRepository.save(d);
+
     if (batteryLevel != null && batteryLevel < 10.0) {
       log.warn("Low battery for asset {}: {}%", asset.getId(), batteryLevel);
-      // create notification / alert (left as integration point)
+      // TODO: Create notification/alert here
     }
+
+    // Map the saved entity to a DTO before returning
+    return IoTDataMapper.toResponseDTO(savedData);
   }
 
   @Override
   public void startSimulator() {
     if (simulatorRunning.compareAndSet(false, true)) {
-      // Correct: The time unit is now explicit and clear.
-      simulatorFuture = taskScheduler.scheduleAtFixedRate(this::runSimulationStep, Duration.ofMillis(5000));
+      simulatorFuture = taskScheduler.scheduleAtFixedRate(this::runSimulationStep, Duration.ofSeconds(10));
       log.info("IoT Simulator started");
     }
   }
@@ -72,22 +94,24 @@ public class IoTServiceImpl implements IoTService {
   @Override
   public void stopSimulator() {
     if (simulatorRunning.compareAndSet(true, false)) {
-      if (simulatorFuture != null) simulatorFuture.cancel(false);
+      if (simulatorFuture != null) {
+        simulatorFuture.cancel(false);
+      }
       log.info("IoT Simulator stopped");
     }
   }
 
   private void runSimulationStep() {
     try {
-      // example: pick first asset to simulate (for demo); production: iterate many devices
-      assetRepository.findAll().stream().findFirst().ifPresent(asset -> {
-        double temp = 20 + Math.random() * 15;
-        double battery = 20 + Math.random() * 80;
+      assetRepository.findAll().stream().findAny().ifPresent(asset -> {
+        double temp = 20 + Math.random() * 15; // Simulate temperature between 20-35 C
+        double battery = 5 + Math.random() * 95; // Simulate battery between 5-100%
         boolean inUse = Math.random() > 0.5;
+        log.info("Simulating data for asset {}: Temp={}, Battery={}", asset.getName(), String.format("%.2f", temp), String.format("%.2f", battery));
         processSensorData(asset.getId(), temp, battery, inUse);
       });
     } catch (Exception e) {
-      log.error("Simulator error", e);
+      log.error("Simulator step failed", e);
     }
   }
 }

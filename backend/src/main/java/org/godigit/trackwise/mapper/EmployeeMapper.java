@@ -1,30 +1,35 @@
 package org.godigit.trackwise.mapper;
 
-import org.godigit.trackwise.model.Employee;
-import org.godigit.trackwise.dto.EmployeeResponseDTO;
 import org.godigit.trackwise.dto.EmployeeRequestDTO;
+import org.godigit.trackwise.dto.EmployeeResponseDTO;
 import org.godigit.trackwise.model.Department;
+import org.godigit.trackwise.model.Employee;
 
 public class EmployeeMapper {
 
-    public static EmployeeResponseDTO toDTO(Employee emp) {
-        EmployeeResponseDTO dto = new EmployeeResponseDTO();
-        dto.setId(emp.getId());
-        dto.setFirstName(emp.getFirstName());
-        dto.setLastName(emp.getLastName());
-        dto.setEmail(emp.getEmail());
-        dto.setPhone(emp.getPhone());
-        dto.setDepartmentName(emp.getDepartment() != null ? emp.getDepartment().getName() : null);
-        return dto;
+    // Map from Request DTO + Department entity → Employee
+    public static Employee toEntity(EmployeeRequestDTO dto, Department department) {
+        Employee employee = new Employee();
+        employee.setFirstName(dto.getFirstName());
+        employee.setLastName(dto.getLastName());
+        employee.setEmail(dto.getEmail());
+        employee.setPhone(dto.getPhone());
+        employee.setDepartment(department);
+        return employee;
     }
 
-    public static Employee toEntity(EmployeeRequestDTO dto, Department dept) {
-        Employee emp = new Employee();
-        emp.setFirstName(dto.getFirstName());
-        emp.setLastName(dto.getLastName());
-        emp.setEmail(dto.getEmail());
-        emp.setPhone(dto.getPhone());
-        emp.setDepartment(dept);
-        return emp;
+    // Map Employee → Response DTO
+    public static EmployeeResponseDTO toDto(Employee employee) {
+        EmployeeResponseDTO dto = new EmployeeResponseDTO();
+        dto.setId(employee.getId());
+        dto.setFirstName(employee.getFirstName());
+        dto.setLastName(employee.getLastName());
+        dto.setEmail(employee.getEmail());
+        dto.setPhone(employee.getPhone());
+        if (employee.getDepartment() != null) {
+            dto.setDepartmentId(employee.getDepartment().getId());
+            dto.setDepartmentName(employee.getDepartment().getName());
+        }
+        return dto;
     }
 }

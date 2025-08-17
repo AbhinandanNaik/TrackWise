@@ -1,19 +1,15 @@
 package org.godigit.trackwise.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
 public class EmployeeResponseDTO {
     private UUID id;
     private String firstName;
     private String lastName;
     private String email;
     private String phone;
-    private String departmentName; // only name to avoid exposing full entity
-
-    // getters and setters
+    private UUID departmentId;
+    private String departmentName; // extra info if you want
 }

@@ -1,8 +1,10 @@
 package org.godigit.trackwise.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.model.Warranty;
+import org.godigit.trackwise.dto.WarrantyRequestDTO;
+import org.godigit.trackwise.dto.WarrantyResponseDTO;
 import org.godigit.trackwise.service.WarrantyService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,33 +20,28 @@ public class WarrantyController {
 
     private final WarrantyService warrantyService;
 
-    // Create or update a warranty
+    // Create or update a warranty using a DTO
     @PostMapping
-    public ResponseEntity<Warranty> createOrUpdate(@RequestBody Warranty warranty) {
-        Warranty saved = warrantyService.createOrUpdate(warranty);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    public ResponseEntity<WarrantyResponseDTO> createOrUpdate(@RequestBody WarrantyRequestDTO request) {
+        WarrantyResponseDTO savedDto = warrantyService.createOrUpdate(request);
+        return new ResponseEntity<>(savedDto, HttpStatus.CREATED);
     }
 
     // Find warranties expiring between two dates
     @GetMapping("/expiring")
-    public ResponseEntity<List<Warranty>> findExpiringBetween(
-            @RequestParam("from") String from,
-            @RequestParam("to") String to) {
-
-        LocalDate fromDate = LocalDate.parse(from);
-        LocalDate toDate = LocalDate.parse(to);
-        List<Warranty> list = warrantyService.findExpiringBetween(fromDate, toDate);
+    public ResponseEntity<List<WarrantyResponseDTO>> findExpiringBetween(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        List<WarrantyResponseDTO> list = warrantyService.findExpiringBetween(from, to);
         return ResponseEntity.ok(list);
     }
 
     // Extend warranty end date
     @PutMapping("/{id}/extend")
-    public ResponseEntity<Void> extendWarranty(
+    public ResponseEntity<WarrantyResponseDTO> extendWarranty(
             @PathVariable("id") UUID warrantyId,
-            @RequestParam("newEndDate") String newEndDateStr) {
-
-        LocalDate newEndDate = LocalDate.parse(newEndDateStr);
-        warrantyService.extendWarranty(warrantyId, newEndDate);
-        return ResponseEntity.ok().build();
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate newEndDate) {
+        WarrantyResponseDTO extendedWarranty = warrantyService.extendWarranty(warrantyId, newEndDate);
+        return ResponseEntity.ok(extendedWarranty);
     }
 }

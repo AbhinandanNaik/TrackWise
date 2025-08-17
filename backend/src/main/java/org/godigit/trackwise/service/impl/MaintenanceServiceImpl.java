@@ -2,7 +2,10 @@ package org.godigit.trackwise.service.impl;
 
 
 import lombok.RequiredArgsConstructor;
+import org.godigit.trackwise.dto.MaintenanceRequestDTO;
+import org.godigit.trackwise.dto.MaintenanceResponseDTO;
 import org.godigit.trackwise.exception.NotFoundException;
+import org.godigit.trackwise.mapper.MaintenanceMapper;
 import org.godigit.trackwise.model.Asset;
 import org.godigit.trackwise.model.AssetStatus;
 import org.godigit.trackwise.model.MaintenanceLog;
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,21 +28,30 @@ public class MaintenanceServiceImpl implements MaintenanceService {
   private final AssetRepository assetRepository;
 
   @Override
-  public MaintenanceLog addMaintenance(UUID assetId, MaintenanceLog log) {
+  public MaintenanceResponseDTO addMaintenance(UUID assetId, MaintenanceRequestDTO request) {
     Asset asset = assetRepository.findById(assetId)
-      .orElseThrow(() -> new NotFoundException("Asset not found: " + assetId));
+            .orElseThrow(() -> new NotFoundException("Asset not found: " + assetId));
+
+    MaintenanceLog log = new MaintenanceLog();
     log.setAsset(asset);
+    log.setDescription(request.getDescription());
+    log.setMaintenanceDate(request.getMaintenanceDate());
+    log.setPerformedBy(request.getPerformedBy());
+
     MaintenanceLog saved = maintenanceLogRepository.save(log);
 
     asset.setStatus(AssetStatus.UNDER_MAINTENANCE);
     assetRepository.save(asset);
 
-    return saved;
+    return MaintenanceMapper.toResponseDTO(saved);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public List<MaintenanceLog> listByAsset(UUID assetId) {
-    return maintenanceLogRepository.findByAssetId(assetId);
+  public List<MaintenanceResponseDTO> listByAsset(UUID assetId) {
+    return maintenanceLogRepository.findByAssetId(assetId)
+            .stream()
+            .map(MaintenanceMapper::toResponseDTO)
+            .collect(Collectors.toList());
   }
 }

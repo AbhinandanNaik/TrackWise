@@ -1,7 +1,8 @@
 package org.godigit.trackwise.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.model.CheckInOutLog;
+import org.godigit.trackwise.dto.CheckInOutRequestDTO;
+import org.godigit.trackwise.dto.CheckInOutResponseDTO;
 import org.godigit.trackwise.service.CheckInOutService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,35 +18,29 @@ public class CheckInOutController {
 
     private final CheckInOutService checkInOutService;
 
-    // Checkout an asset to an employee
+    // Use @RequestBody to accept a JSON object
     @PostMapping("/checkout")
-    public ResponseEntity<CheckInOutLog> checkoutAsset(
-            @RequestParam UUID assetId,
-            @RequestParam UUID employeeId) {
-        CheckInOutLog log = checkInOutService.checkoutAsset(assetId, employeeId);
-        return new ResponseEntity<>(log, HttpStatus.CREATED);
+    public ResponseEntity<CheckInOutResponseDTO> checkoutAsset(@RequestBody CheckInOutRequestDTO request) {
+        CheckInOutResponseDTO logDto = checkInOutService.checkoutAsset(request);
+        return new ResponseEntity<>(logDto, HttpStatus.CREATED);
     }
 
-    // Checkin an asset from an employee
+    // Use @RequestBody here as well
     @PostMapping("/checkin")
-    public ResponseEntity<CheckInOutLog> checkinAsset(
-            @RequestParam UUID assetId,
-            @RequestParam UUID employeeId) {
-        CheckInOutLog log = checkInOutService.checkinAsset(assetId, employeeId);
-        return new ResponseEntity<>(log, HttpStatus.CREATED);
+    public ResponseEntity<CheckInOutResponseDTO> checkinAsset(@RequestBody CheckInOutRequestDTO request) {
+        CheckInOutResponseDTO logDto = checkInOutService.checkinAsset(request);
+        return new ResponseEntity<>(logDto, HttpStatus.OK); // Use OK for updates/completions
     }
 
-    // Get check-in/check-out history for an asset
     @GetMapping("/asset/{assetId}/history")
-    public ResponseEntity<List<CheckInOutLog>> historyByAsset(@PathVariable UUID assetId) {
-        List<CheckInOutLog> logs = checkInOutService.historyByAsset(assetId);
+    public ResponseEntity<List<CheckInOutResponseDTO>> historyByAsset(@PathVariable UUID assetId) {
+        List<CheckInOutResponseDTO> logs = checkInOutService.historyByAsset(assetId);
         return ResponseEntity.ok(logs);
     }
 
-    // Get check-in/check-out history for an employee
     @GetMapping("/employee/{employeeId}/history")
-    public ResponseEntity<List<CheckInOutLog>> historyByEmployee(@PathVariable UUID employeeId) {
-        List<CheckInOutLog> logs = checkInOutService.historyByEmployee(employeeId);
+    public ResponseEntity<List<CheckInOutResponseDTO>> historyByEmployee(@PathVariable UUID employeeId) {
+        List<CheckInOutResponseDTO> logs = checkInOutService.historyByEmployee(employeeId);
         return ResponseEntity.ok(logs);
     }
 }
