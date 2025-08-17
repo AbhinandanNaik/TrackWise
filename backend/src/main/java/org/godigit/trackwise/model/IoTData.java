@@ -23,4 +23,6 @@ public class IoTData extends BaseEntity {
 
   @Column(nullable = false)
   private Instant timestamp;
+  private Double latitude;  // Add this
+  private Double longitude;
 }

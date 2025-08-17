@@ -1,20 +1,20 @@
 package org.godigit.trackwise.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.godigit.trackwise.dto.AssetScanRequestDTO;
 import org.godigit.trackwise.dto.CheckInOutRequestDTO;
 import org.godigit.trackwise.dto.CheckInOutResponseDTO;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.mapper.CheckInOutMapper;
-import org.godigit.trackwise.model.Asset;
-import org.godigit.trackwise.model.AssetStatus;
-import org.godigit.trackwise.model.CheckInOutLog;
-import org.godigit.trackwise.model.Employee;
+import org.godigit.trackwise.model.*;
 import org.godigit.trackwise.repository.AssetRepository;
 import org.godigit.trackwise.repository.CheckInOutLogRepository;
 import org.godigit.trackwise.repository.EmployeeRepository;
 import org.godigit.trackwise.service.CheckInOutService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.List;
@@ -29,6 +29,7 @@ public class CheckInOutServiceImpl implements CheckInOutService {
     private final CheckInOutLogRepository checkInOutLogRepository;
     private final AssetRepository assetRepository;
     private final EmployeeRepository employeeRepository;
+    private static final Logger log = LoggerFactory.getLogger(CheckInOutServiceImpl.class);
 
     @Override
     public CheckInOutResponseDTO checkoutAsset(CheckInOutRequestDTO request) {
@@ -46,6 +47,7 @@ public class CheckInOutServiceImpl implements CheckInOutService {
         log.setAsset(asset);
         log.setEmployee(emp);
         log.setCheckOutTime(Instant.now());
+        log.setAction(CheckInOutAction.CHECK_OUT);
         CheckInOutLog savedLog = checkInOutLogRepository.save(log);
 
         asset.setAssignedTo(emp);
@@ -95,4 +97,26 @@ public class CheckInOutServiceImpl implements CheckInOutService {
                 .map(CheckInOutMapper::toDTO)
                 .collect(Collectors.toList());
     }
+    @Override
+    public CheckInOutResponseDTO processAssetScan(AssetScanRequestDTO request) {
+        Asset asset = assetRepository.findById(request.getAssetId())
+                .orElseThrow(() -> new NotFoundException("Asset not found: " + request.getAssetId()));
+
+        CheckInOutRequestDTO actionRequest = new CheckInOutRequestDTO();
+        actionRequest.setAssetId(request.getAssetId());
+        actionRequest.setEmployeeId(request.getEmployeeId());
+
+        // The "smart" logic to decide what to do
+        if (asset.getStatus() == AssetStatus.AVAILABLE) {
+            log.info("Asset {} is available. Processing checkout for employee {}", asset.getName(), request.getEmployeeId());
+            return this.checkoutAsset(actionRequest);
+        } else if (asset.getStatus() == AssetStatus.ASSIGNED) {
+            log.info("Asset {} is assigned. Processing check-in for employee {}", asset.getName(), request.getEmployeeId());
+            return this.checkinAsset(actionRequest);
+        } else {
+            // If asset is UNDER_MAINTENANCE, RETIRED, etc.
+            throw new IllegalStateException("Asset cannot be checked in or out. Current status: " + asset.getStatus());
+        }
+    }
+
 }

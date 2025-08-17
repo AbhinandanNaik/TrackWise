@@ -1,5 +1,6 @@
 package org.godigit.trackwise.service;
 
+import org.godigit.trackwise.dto.AssetScanRequestDTO;
 import org.godigit.trackwise.dto.CheckInOutRequestDTO; // Use DTOs
 import org.godigit.trackwise.dto.CheckInOutResponseDTO;
 
@@ -17,4 +18,7 @@ public interface CheckInOutService {
   List<CheckInOutResponseDTO> historyByAsset(UUID assetId);
 
   List<CheckInOutResponseDTO> historyByEmployee(UUID employeeId);
+
+  // Add the new method for the smart scan
+  CheckInOutResponseDTO processAssetScan(AssetScanRequestDTO request);
 }

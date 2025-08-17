@@ -21,6 +21,11 @@ public class CheckInOutLog extends BaseEntity {
   @JoinColumn(name = "employee_id")
   private Employee employee;
 
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private CheckInOutAction action;
+
   @Column(nullable = false)
   private Instant checkOutTime;
 

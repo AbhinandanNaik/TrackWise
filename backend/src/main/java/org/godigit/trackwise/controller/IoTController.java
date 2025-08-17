@@ -17,7 +17,7 @@ public class IoTController {
 
     private final IoTService iotService;
 
-    // Ingest IoT data using the new DTO
+    // Ingest IoT data using the updated DTO
     @PostMapping("/ingest")
     public ResponseEntity<IoTDataResponseDTO> ingestData(@RequestBody IoTDataRequestDTO request) {
         IoTDataResponseDTO savedDto = iotService.ingest(request);
@@ -30,8 +30,11 @@ public class IoTController {
             @PathVariable UUID assetId,
             @RequestParam Double temperature,
             @RequestParam Double batteryLevel,
-            @RequestParam Boolean inUse) {
-        IoTDataResponseDTO processedData = iotService.processSensorData(assetId, temperature, batteryLevel, inUse);
+            @RequestParam Boolean inUse,
+            // Add the new location parameters
+            @RequestParam Double latitude,
+            @RequestParam Double longitude) {
+        IoTDataResponseDTO processedData = iotService.processSensorData(assetId, temperature, batteryLevel, inUse, latitude, longitude);
         return ResponseEntity.ok(processedData);
     }
 

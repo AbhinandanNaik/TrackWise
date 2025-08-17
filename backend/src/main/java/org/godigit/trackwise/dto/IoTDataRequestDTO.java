@@ -9,4 +9,6 @@ public class IoTDataRequestDTO {
     private Double temperature;
     private Double batteryLevel;
     private Boolean inUse;
+    private Double latitude;
+    private Double longitude;
 }

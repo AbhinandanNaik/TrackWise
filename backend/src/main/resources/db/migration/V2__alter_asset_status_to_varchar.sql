@@ -1,0 +1,3 @@
+ALTER TABLE assets ALTER COLUMN status TYPE VARCHAR(255);
+
+DROP TYPE asset_status;

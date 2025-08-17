@@ -1,6 +1,7 @@
 package org.godigit.trackwise.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.godigit.trackwise.dto.AssetScanRequestDTO;
 import org.godigit.trackwise.dto.CheckInOutRequestDTO;
 import org.godigit.trackwise.dto.CheckInOutResponseDTO;
 import org.godigit.trackwise.service.CheckInOutService;
@@ -42,5 +43,11 @@ public class CheckInOutController {
     public ResponseEntity<List<CheckInOutResponseDTO>> historyByEmployee(@PathVariable UUID employeeId) {
         List<CheckInOutResponseDTO> logs = checkInOutService.historyByEmployee(employeeId);
         return ResponseEntity.ok(logs);
+    }
+
+    @PostMapping("/scan")
+    public ResponseEntity<CheckInOutResponseDTO> processScan(@RequestBody AssetScanRequestDTO request) {
+        CheckInOutResponseDTO response = checkInOutService.processAssetScan(request);
+        return ResponseEntity.ok(response);
     }
 }
