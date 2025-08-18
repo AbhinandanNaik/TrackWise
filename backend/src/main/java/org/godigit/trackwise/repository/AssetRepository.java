@@ -23,4 +23,7 @@ public interface AssetRepository extends JpaRepository<Asset, UUID> {
   // Correct Query (in AssetRepository.java)
   @Query("SELECT a FROM Asset a WHERE a.warrantyExpiryDate BETWEEN :from AND :to")
   List<Asset> findByWarrantyExpiryDateBetween(@Param("from") LocalDate from, @Param("to") LocalDate to);
+
+  @Query("SELECT DISTINCT a.name FROM Asset a WHERE a.name IS NOT NULL")
+  List<String> findDistinctAssetNames();
 }

@@ -28,5 +28,6 @@ public class Notification {
 
   private boolean read = false;
 
+  @Builder.Default
   private Instant createdAt = Instant.now();
 }
