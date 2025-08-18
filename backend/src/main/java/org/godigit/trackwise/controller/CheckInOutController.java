@@ -25,7 +25,7 @@ public class CheckInOutController {
         CheckInOutResponseDTO logDto = checkInOutService.checkoutAsset(request);
         return new ResponseEntity<>(logDto, HttpStatus.CREATED);
     }
-
+//vdsvsd
     // Use @RequestBody here as well
     @PostMapping("/checkin")
     public ResponseEntity<CheckInOutResponseDTO> checkinAsset(@RequestBody CheckInOutRequestDTO request) {
