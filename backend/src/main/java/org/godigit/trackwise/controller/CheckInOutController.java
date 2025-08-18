@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+//REST controller for handling asset check-in and check-out operations.
+
 @RestController
 @RequestMapping("/api/checkinout")
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class CheckInOutController {
         CheckInOutResponseDTO logDto = checkInOutService.checkoutAsset(request);
         return new ResponseEntity<>(logDto, HttpStatus.CREATED);
     }
-//vdsvsd
+
     // Use @RequestBody here as well
     @PostMapping("/checkin")
     public ResponseEntity<CheckInOutResponseDTO> checkinAsset(@RequestBody CheckInOutRequestDTO request) {
