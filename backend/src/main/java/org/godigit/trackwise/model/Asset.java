@@ -36,5 +36,7 @@ public class Asset extends BaseEntity {
   @OneToOne(mappedBy = "asset", cascade = CascadeType.ALL, orphanRemoval = true)
   private Warranty warranty;
 
+  private String performanceStatus;
+
 
 }

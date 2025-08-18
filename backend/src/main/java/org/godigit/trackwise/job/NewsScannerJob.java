@@ -9,6 +9,7 @@ import org.godigit.trackwise.repository.AssetRepository;
 import org.godigit.trackwise.repository.EmployeeRepository;
 import org.godigit.trackwise.service.NewsService;
 import org.godigit.trackwise.service.NotificationService;
+import org.godigit.trackwise.service.OpenAIService;
 import org.quartz.JobExecutionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ public class NewsScannerJob extends QuartzJobBean {
     private final AssetRepository assetRepository;
     private final EmployeeRepository employeeRepository; // To find an admin
     private final NewsService newsService;
+    private final OpenAIService openAIService;
     private final NotificationService notificationService; // Inject NotificationService
 
     @Override
@@ -39,30 +41,19 @@ public class NewsScannerJob extends QuartzJobBean {
             return;
         }
 
-        List<String> keywords = assetRepository.findDistinctAssetNames();
 
+        List<String> keywords = assetRepository.findDistinctAssetNames();
         for (String keyword : keywords) {
             List<ArticleDTO> articles = newsService.fetchNewsForKeyword(keyword);
 
-            if (!articles.isEmpty()) {
-                ArticleDTO firstArticle = articles.get(0);
-                String message = String.format("New article for '%s': %s", keyword, firstArticle.getTitle());
-                log.info("ALERT: {}", message);
+            for (ArticleDTO article : articles) {
+                // Use AI to filter for relevance
+                if (openAIService.isNewsArticleRelevant(article.getTitle(), article.getDescription())) {
+                    String message = String.format("URGENT NEWS for '%s': %s", keyword, article.getTitle());
+                    log.info("CRITICAL ALERT: {}", message);
 
-                // --- THIS IS THE NEW LOGIC ---
-
-                // 1. Create an in-app notification
-                NotificationRequestDTO inAppRequest = new NotificationRequestDTO();
-                inAppRequest.setRecipientId(admin.getId());
-                inAppRequest.setMessage(message);
-                notificationService.createInAppNotification(inAppRequest);
-
-                // 2. Send an email alert
-                EmailRequestDTO emailRequest = new EmailRequestDTO();
-                emailRequest.setTo(admin.getEmail());
-                emailRequest.setSubject("Asset News Alert: " + keyword);
-                emailRequest.setBody(message + "\n\nRead more here: " + firstArticle.getUrl());
-                notificationService.sendEmail(emailRequest);
+                    // Create in-app notification and send email for the filtered article...
+                }
             }
         }
         log.info("Finished daily news scan.");

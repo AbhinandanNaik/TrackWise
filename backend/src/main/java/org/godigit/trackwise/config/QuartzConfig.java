@@ -1,10 +1,8 @@
 package org.godigit.trackwise.config;
 
+import org.godigit.trackwise.job.AssetPerformanceAnalysisJob;
 import org.godigit.trackwise.job.NewsScannerJob;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.Trigger;
-import org.quartz.TriggerBuilder;
+import org.quartz.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
@@ -39,5 +37,25 @@ public class QuartzConfig {
         // For testing, you could run it every minute: "0 * * ? * *"
         factoryBean.afterPropertiesSet();
         return factoryBean.getObject();
+    }
+
+    // In QuartzConfig.java
+// ... (existing beans for newsScannerJob)
+
+    @Bean
+    public JobDetail assetPerformanceJobDetail() {
+        return JobBuilder.newJob(AssetPerformanceAnalysisJob.class)
+                .withIdentity("assetPerformanceJob")
+                .storeDurably()
+                .build();
+    }
+
+    @Bean
+    public Trigger assetPerformanceJobTrigger(JobDetail assetPerformanceJobDetail) {
+        // This runs the job every Sunday at 3 AM
+        return TriggerBuilder.newTrigger().forJob(assetPerformanceJobDetail)
+                .withIdentity("assetPerformanceTrigger")
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 3 ? * SUN"))
+                .build();
     }
 }

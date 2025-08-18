@@ -1,0 +1,1 @@
+ALTER TABLE assets ADD COLUMN performance_status VARCHAR(255);
