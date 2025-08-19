@@ -110,7 +110,7 @@ public class IoTServiceImplTest {
         // Verify interactions
         verify(assetRepository).findById(assetId);
         verify(iotDataRepository).save(any(IoTData.class));
-        verify(messagingTemplate).convertAndSend(eq("/topic/asset-locations"), any(IoTDataResponseDTO.class), any(Map.class));
+        verify(messagingTemplate).convertAndSend(eq("/topic/asset-locations"), any(IoTDataResponseDTO.class));
     }
 
     @Test
@@ -149,7 +149,7 @@ public class IoTServiceImplTest {
         // Verify interactions
         verify(assetRepository).findById(assetId);
         verify(iotDataRepository).save(any(IoTData.class));
-        verify(messagingTemplate).convertAndSend(eq("/topic/asset-locations"), any(IoTDataResponseDTO.class), any(Map.class));
+        verify(messagingTemplate).convertAndSend(eq("/topic/asset-locations"), any(IoTDataResponseDTO.class));
     }
 
     @Test

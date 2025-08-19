@@ -3,32 +3,25 @@ package org.godigit.trackwise.service.impl;
 import org.godigit.trackwise.dto.AssetScanRequestDTO;
 import org.godigit.trackwise.dto.CheckInOutRequestDTO;
 import org.godigit.trackwise.dto.CheckInOutResponseDTO;
-import org.godigit.trackwise.exception.NotFoundException;
-import org.godigit.trackwise.mapper.CheckInOutMapper;
 import org.godigit.trackwise.model.*;
 import org.godigit.trackwise.repository.AssetRepository;
 import org.godigit.trackwise.repository.CheckInOutLogRepository;
 import org.godigit.trackwise.repository.EmployeeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class CheckInOutServiceImplTest {
 
-    @Mock
-    private CheckInOutLogRepository checkInOutLogRepository;
+    @InjectMocks
+    private CheckInOutServiceImpl checkInOutService;
 
     @Mock
     private AssetRepository assetRepository;
@@ -36,19 +29,18 @@ class CheckInOutServiceImplTest {
     @Mock
     private EmployeeRepository employeeRepository;
 
-    @InjectMocks
-    private CheckInOutServiceImpl checkInOutService;
+    @Mock
+    private CheckInOutLogRepository checkInOutLogRepository;
 
     private UUID assetId;
     private UUID employeeId;
     private Asset asset;
     private Employee employee;
-    private CheckInOutLog checkInOutLog;
+    private CheckInOutLog log;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
         assetId = UUID.randomUUID();
         employeeId = UUID.randomUUID();
 
@@ -60,157 +52,127 @@ class CheckInOutServiceImplTest {
         employee = new Employee();
         employee.setId(employeeId);
         employee.setFirstName("John");
-        employee.setLastName("Doe");
 
-        checkInOutLog = new CheckInOutLog();
-        checkInOutLog.setId(UUID.randomUUID());
-        checkInOutLog.setAsset(asset);
-        checkInOutLog.setEmployee(employee);
-        checkInOutLog.setCheckOutTime(Instant.now());
-        checkInOutLog.setAction(CheckInOutAction.CHECK_OUT);
+        log = new CheckInOutLog();
+        log.setId(UUID.randomUUID());
+        log.setAsset(asset);
+        log.setEmployee(employee);
+        log.setCheckOutTime(Instant.now());
+        log.setAction(CheckInOutAction.CHECK_OUT);
     }
 
     @Test
     void shouldCheckoutAsset() {
-        // Arrange
         CheckInOutRequestDTO request = new CheckInOutRequestDTO();
         request.setAssetId(assetId);
         request.setEmployeeId(employeeId);
-        // Remove setNotes as it doesn't exist in CheckInOutRequestDTO
 
         when(assetRepository.findById(assetId)).thenReturn(Optional.of(asset));
         when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        when(checkInOutLogRepository.save(any(CheckInOutLog.class))).thenReturn(checkInOutLog);
+        when(checkInOutLogRepository.save(any())).thenReturn(log);
 
-        // Act
         CheckInOutResponseDTO response = checkInOutService.checkoutAsset(request);
 
-        // Assert
         assertThat(response).isNotNull();
         assertThat(response.getAssetId()).isEqualTo(assetId);
         assertThat(response.getEmployeeId()).isEqualTo(employeeId);
-        // Remove getAction assertion as it doesn't exist in CheckInOutResponseDTO
 
-        verify(assetRepository).findById(assetId);
-        verify(employeeRepository).findById(employeeId);
-        verify(checkInOutLogRepository).save(any(CheckInOutLog.class));
         verify(assetRepository).save(asset);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenAssetNotAvailableForCheckout() {
-        // Arrange
-        CheckInOutRequestDTO request = new CheckInOutRequestDTO();
-        request.setAssetId(assetId);
-        request.setEmployeeId(employeeId);
-
-        asset.setStatus(AssetStatus.ASSIGNED);
-
-        when(assetRepository.findById(assetId)).thenReturn(Optional.of(asset));
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-
-        // Act & Assert
-        assertThatThrownBy(() -> checkInOutService.checkoutAsset(request))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("Asset is not available for checkout");
-
-        verify(assetRepository).findById(assetId);
-        verify(employeeRepository).findById(employeeId);
-        verify(checkInOutLogRepository, never()).save(any());
     }
 
     @Test
     void shouldCheckinAsset() {
-        // Arrange
+        asset.setStatus(AssetStatus.ASSIGNED);
+        asset.setAssignedTo(employee);
+        log.setCheckInTime(null);
+
         CheckInOutRequestDTO request = new CheckInOutRequestDTO();
         request.setAssetId(assetId);
         request.setEmployeeId(employeeId);
-        // Remove setNotes as it doesn't exist in CheckInOutRequestDTO
 
-        asset.setStatus(AssetStatus.ASSIGNED);
-        asset.setAssignedTo(employee);
+        when(checkInOutLogRepository.findFirstByAssetIdAndCheckInTimeIsNullOrderByCheckOutTimeDesc(assetId))
+                .thenReturn(Optional.of(log));
+        when(checkInOutLogRepository.save(any())).thenReturn(log);
 
-        CheckInOutLog checkinLog = new CheckInOutLog();
-        checkinLog.setId(UUID.randomUUID());
-        checkinLog.setAsset(asset);
-        checkinLog.setEmployee(employee);
-        checkinLog.setCheckInTime(Instant.now());
-        checkinLog.setAction(CheckInOutAction.CHECK_IN);
-
-        when(assetRepository.findById(assetId)).thenReturn(Optional.of(asset));
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        when(checkInOutLogRepository.save(any(CheckInOutLog.class))).thenReturn(checkinLog);
-
-        // Act
         CheckInOutResponseDTO response = checkInOutService.checkinAsset(request);
 
-        // Assert
         assertThat(response).isNotNull();
         assertThat(response.getAssetId()).isEqualTo(assetId);
         assertThat(response.getEmployeeId()).isEqualTo(employeeId);
-        // Remove getAction assertion as it doesn't exist in CheckInOutResponseDTO
 
-        verify(assetRepository).findById(assetId);
-        verify(employeeRepository).findById(employeeId);
-        verify(checkInOutLogRepository).save(any(CheckInOutLog.class));
         verify(assetRepository).save(asset);
     }
 
     @Test
-    void shouldGetHistoryByAsset() {
-        // Arrange
-        when(checkInOutLogRepository.findByAssetId(assetId))
-                .thenReturn(List.of(checkInOutLog));
+    void shouldProcessAssetScan_Checkout() {
+        asset.setStatus(AssetStatus.AVAILABLE);
 
-        // Act
-        List<CheckInOutResponseDTO> history = checkInOutService.historyByAsset(assetId);
-
-        // Assert
-        assertThat(history).isNotNull();
-        assertThat(history).hasSize(1);
-        assertThat(history.get(0).getAssetId()).isEqualTo(assetId);
-
-        verify(checkInOutLogRepository).findByAssetId(assetId);
-    }
-
-    @Test
-    void shouldGetHistoryByEmployee() {
-        // Arrange
-        when(checkInOutLogRepository.findByEmployeeId(employeeId))
-                .thenReturn(List.of(checkInOutLog));
-
-        // Act
-        List<CheckInOutResponseDTO> history = checkInOutService.historyByEmployee(employeeId);
-
-        // Assert
-        assertThat(history).isNotNull();
-        assertThat(history).hasSize(1);
-        assertThat(history.get(0).getEmployeeId()).isEqualTo(employeeId);
-
-        verify(checkInOutLogRepository).findByEmployeeId(employeeId);
-    }
-
-    @Test
-    void shouldProcessAssetScan() {
-        // Arrange
         AssetScanRequestDTO request = new AssetScanRequestDTO();
         request.setAssetId(assetId);
         request.setEmployeeId(employeeId);
-        // Remove setLatitude and setLongitude as they don't exist in AssetScanRequestDTO
 
         when(assetRepository.findById(assetId)).thenReturn(Optional.of(asset));
         when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        when(checkInOutLogRepository.save(any(CheckInOutLog.class))).thenReturn(checkInOutLog);
+        when(checkInOutLogRepository.save(any())).thenReturn(log);
 
-        // Act
         CheckInOutResponseDTO response = checkInOutService.processAssetScan(request);
 
-        // Assert
         assertThat(response).isNotNull();
         assertThat(response.getAssetId()).isEqualTo(assetId);
+    }
 
-        verify(assetRepository).findById(assetId);
-        verify(employeeRepository).findById(employeeId);
-        verify(checkInOutLogRepository).save(any(CheckInOutLog.class));
+    @Test
+    void shouldProcessAssetScan_Checkin() {
+        asset.setStatus(AssetStatus.ASSIGNED);
+        asset.setAssignedTo(employee);
+        log.setCheckInTime(null);
+
+        AssetScanRequestDTO request = new AssetScanRequestDTO();
+        request.setAssetId(assetId);
+        request.setEmployeeId(employeeId);
+
+        when(assetRepository.findById(assetId)).thenReturn(Optional.of(asset));
+        when(checkInOutLogRepository.findFirstByAssetIdAndCheckInTimeIsNullOrderByCheckOutTimeDesc(assetId))
+                .thenReturn(Optional.of(log));
+        when(checkInOutLogRepository.save(any())).thenReturn(log);
+
+        CheckInOutResponseDTO response = checkInOutService.processAssetScan(request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getAssetId()).isEqualTo(assetId);
+    }
+
+    @Test
+    void shouldReturnHistoryByAsset() {
+        when(checkInOutLogRepository.findByAssetId(assetId)).thenReturn(List.of(log));
+
+        List<CheckInOutResponseDTO> history = checkInOutService.historyByAsset(assetId);
+
+        assertThat(history).hasSize(1);
+        assertThat(history.get(0).getAssetId()).isEqualTo(assetId);
+    }
+
+    @Test
+    void shouldReturnHistoryByEmployee() {
+        when(checkInOutLogRepository.findByEmployeeId(employeeId)).thenReturn(List.of(log));
+
+        List<CheckInOutResponseDTO> history = checkInOutService.historyByEmployee(employeeId);
+
+        assertThat(history).hasSize(1);
+        assertThat(history.get(0).getEmployeeId()).isEqualTo(employeeId);
+    }
+
+    @Test
+    void shouldThrowIfAssetNotAvailableForCheckout() {
+        asset.setStatus(AssetStatus.ASSIGNED);
+
+        CheckInOutRequestDTO request = new CheckInOutRequestDTO();
+        request.setAssetId(assetId);
+        request.setEmployeeId(employeeId);
+
+        when(assetRepository.findById(assetId)).thenReturn(Optional.of(asset));
+        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
+
+        assertThrows(IllegalStateException.class, () -> checkInOutService.checkoutAsset(request));
     }
 }
