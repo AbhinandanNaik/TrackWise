@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+//REST controller for handling asset check-in and check-out operations.
+
 @RestController
 @RequestMapping("/api/checkinout")
 @RequiredArgsConstructor
