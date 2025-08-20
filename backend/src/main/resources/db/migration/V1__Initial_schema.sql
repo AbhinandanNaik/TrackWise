@@ -107,3 +107,12 @@ CREATE TABLE notifications (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
     CONSTRAINT fk_notification_recipient FOREIGN KEY (recipient_id) REFERENCES employees(id)
 );
+
+
+CREATE TABLE users (
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(255)
+);
+

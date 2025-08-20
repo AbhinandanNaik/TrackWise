@@ -1,0 +1,22 @@
+package org.godigit.trackwise.dto;
+
+import lombok.Getter;
+
+public class AuthResponse {
+    private String jwt;
+
+    public AuthResponse() {} // Default constructor
+
+    public AuthResponse(String jwt) {
+        this.jwt = jwt;
+    }
+
+    public String getJwt() {
+        return jwt;
+    }
+
+    public void setJwt(String jwt) {
+        this.jwt = jwt;
+    }
+}
+
