@@ -2,11 +2,10 @@ package org.godigit.trackwise.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.godigit.trackwise.config.SecurityConfig;
-import org.godigit.trackwise.dto.WarrantyRequestDTO;
-import org.godigit.trackwise.dto.WarrantyResponseDTO;
+import org.godigit.trackwise.dto.WarrantyRequest;
+import org.godigit.trackwise.dto.WarrantyResponse;
 import org.godigit.trackwise.service.WarrantyService;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -40,8 +39,8 @@ class WarrantyControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private WarrantyRequestDTO sampleRequest() {
-        WarrantyRequestDTO request = new WarrantyRequestDTO();
+    private WarrantyRequest sampleRequest() {
+        WarrantyRequest request = new WarrantyRequest();
         request.setAssetId(UUID.randomUUID());
         request.setStartDate(LocalDate.of(2024, 1, 1));
         request.setEndDate(LocalDate.of(2026, 1, 1));
@@ -49,8 +48,8 @@ class WarrantyControllerTest {
         return request;
     }
 
-    private WarrantyResponseDTO sampleResponse() {
-        WarrantyResponseDTO response = new WarrantyResponseDTO();
+    private WarrantyResponse sampleResponse() {
+        WarrantyResponse response = new WarrantyResponse();
         response.setWarrantyId(UUID.randomUUID());
         response.setAssetId(UUID.randomUUID());
         response.setStartDate(LocalDate.of(2024, 1, 1));
@@ -62,8 +61,8 @@ class WarrantyControllerTest {
 
     @Test
     void shouldCreateOrUpdateWarranty() throws Exception {
-        WarrantyRequestDTO request = sampleRequest();
-        WarrantyResponseDTO response = sampleResponse();
+        WarrantyRequest request = sampleRequest();
+        WarrantyResponse response = sampleResponse();
 
         when(warrantyService.createOrUpdate(any())).thenReturn(response);
 
@@ -78,7 +77,7 @@ class WarrantyControllerTest {
     void shouldFindWarrantiesExpiringBetween() throws Exception {
         LocalDate from = LocalDate.of(2025, 1, 1);
         LocalDate to = LocalDate.of(2025, 12, 31);
-        WarrantyResponseDTO response = sampleResponse();
+        WarrantyResponse response = sampleResponse();
 
         when(warrantyService.findExpiringBetween(eq(from), eq(to)))
                 .thenReturn(List.of(response));
@@ -95,7 +94,7 @@ class WarrantyControllerTest {
     void shouldExtendWarranty() throws Exception {
         UUID warrantyId = UUID.randomUUID();
         LocalDate newEndDate = LocalDate.of(2027, 1, 1);
-        WarrantyResponseDTO response = sampleResponse();
+        WarrantyResponse response = sampleResponse();
         response.setWarrantyId(warrantyId);
         response.setEndDate(newEndDate);
 

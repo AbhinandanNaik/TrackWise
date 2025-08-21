@@ -3,7 +3,7 @@ package org.godigit.trackwise.dto;
 import lombok.Data;
 
 @Data
-public class EmailRequestDTO {
+public class EmailRequest {
     private String to;
     private String subject;
     private String body;

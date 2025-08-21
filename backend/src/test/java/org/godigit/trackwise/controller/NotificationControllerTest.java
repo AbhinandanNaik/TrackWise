@@ -2,9 +2,9 @@ package org.godigit.trackwise.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.godigit.trackwise.config.SecurityConfig;
-import org.godigit.trackwise.dto.EmailRequestDTO;
-import org.godigit.trackwise.dto.NotificationRequestDTO;
-import org.godigit.trackwise.dto.NotificationResponseDTO;
+import org.godigit.trackwise.dto.EmailRequest;
+import org.godigit.trackwise.dto.NotificationRequest;
+import org.godigit.trackwise.dto.NotificationResponse;
 import org.godigit.trackwise.service.NotificationService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -37,15 +37,15 @@ class NotificationControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private NotificationRequestDTO sampleNotificationRequest() {
-        NotificationRequestDTO request = new NotificationRequestDTO();
+    private NotificationRequest sampleNotificationRequest() {
+        NotificationRequest request = new NotificationRequest();
         request.setRecipientId(UUID.randomUUID());
         request.setMessage("Your asset requires maintenance");
         return request;
     }
 
-    private NotificationResponseDTO sampleNotificationResponse() {
-        NotificationResponseDTO response = new NotificationResponseDTO();
+    private NotificationResponse sampleNotificationResponse() {
+        NotificationResponse response = new NotificationResponse();
         response.setId(UUID.randomUUID());
         response.setRecipientId(UUID.randomUUID());
         response.setRecipientName("John Doe");
@@ -55,8 +55,8 @@ class NotificationControllerTest {
         return response;
     }
 
-    private EmailRequestDTO sampleEmailRequest() {
-        EmailRequestDTO request = new EmailRequestDTO();
+    private EmailRequest sampleEmailRequest() {
+        EmailRequest request = new EmailRequest();
         request.setTo("user@example.com");
         request.setSubject("Asset Maintenance Reminder");
         request.setBody("Your asset is due for maintenance.");
@@ -65,8 +65,8 @@ class NotificationControllerTest {
 
     @Test
     void shouldCreateInAppNotification() throws Exception {
-        NotificationRequestDTO request = sampleNotificationRequest();
-        NotificationResponseDTO response = sampleNotificationResponse();
+        NotificationRequest request = sampleNotificationRequest();
+        NotificationResponse response = sampleNotificationResponse();
 
         when(notificationService.createInAppNotification(Mockito.any())).thenReturn(response);
 
@@ -80,7 +80,7 @@ class NotificationControllerTest {
 
     @Test
     void shouldSendEmail() throws Exception {
-        EmailRequestDTO request = sampleEmailRequest();
+        EmailRequest request = sampleEmailRequest();
 
         doNothing().when(notificationService).sendEmail(Mockito.any());
 

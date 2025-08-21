@@ -1,7 +1,7 @@
 package org.godigit.trackwise.service.impl;
 
-import org.godigit.trackwise.dto.WarrantyRequestDTO;
-import org.godigit.trackwise.dto.WarrantyResponseDTO;
+import org.godigit.trackwise.dto.WarrantyRequest;
+import org.godigit.trackwise.dto.WarrantyResponse;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.model.Asset;
 import org.godigit.trackwise.model.Warranty;
@@ -41,7 +41,7 @@ class WarrantyServiceImplTest {
     private UUID warrantyId;
     private Asset asset;
     private Warranty warranty;
-    private WarrantyRequestDTO requestDTO;
+    private WarrantyRequest requestDTO;
 
     @BeforeEach
     void setUp() {
@@ -61,7 +61,7 @@ class WarrantyServiceImplTest {
 
         asset.setWarranty(warranty);
 
-        requestDTO = new WarrantyRequestDTO();
+        requestDTO = new WarrantyRequest();
         requestDTO.setAssetId(assetId);
         requestDTO.setStartDate(LocalDate.of(2023, 1, 1));
         requestDTO.setEndDate(LocalDate.of(2024, 12, 31));
@@ -80,7 +80,7 @@ class WarrantyServiceImplTest {
         when(warrantyRepository.save(any(Warranty.class))).thenReturn(warranty);
 
         // Act
-        WarrantyResponseDTO result = warrantyService.createOrUpdate(requestDTO);
+        WarrantyResponse result = warrantyService.createOrUpdate(requestDTO);
 
         // Assert
         assertThat(result).isNotNull();
@@ -102,7 +102,7 @@ class WarrantyServiceImplTest {
         when(warrantyRepository.save(any(Warranty.class))).thenReturn(warranty);
 
         // Act
-        WarrantyResponseDTO result = warrantyService.createOrUpdate(requestDTO);
+        WarrantyResponse result = warrantyService.createOrUpdate(requestDTO);
 
         // Assert
         assertThat(result).isNotNull();
@@ -149,7 +149,7 @@ class WarrantyServiceImplTest {
         when(warrantyRepository.findByEndDateBetween(from, to)).thenReturn(warranties);
         
         // Act
-        List<WarrantyResponseDTO> results = warrantyService.findExpiringBetween(from, to);
+        List<WarrantyResponse> results = warrantyService.findExpiringBetween(from, to);
         
         // Assert
         assertThat(results).hasSize(2);
@@ -168,7 +168,7 @@ class WarrantyServiceImplTest {
         when(warrantyRepository.findByEndDateBetween(from, to)).thenReturn(List.of());
         
         // Act
-        List<WarrantyResponseDTO> results = warrantyService.findExpiringBetween(from, to);
+        List<WarrantyResponse> results = warrantyService.findExpiringBetween(from, to);
         
         // Assert
         assertThat(results).isEmpty();
@@ -188,7 +188,7 @@ class WarrantyServiceImplTest {
         when(warrantyRepository.save(any(Warranty.class))).thenReturn(updatedWarranty);
         
         // Act
-        WarrantyResponseDTO result = warrantyService.extendWarranty(warrantyId, newEndDate);
+        WarrantyResponse result = warrantyService.extendWarranty(warrantyId, newEndDate);
         
         // Assert
         assertThat(result).isNotNull();

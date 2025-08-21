@@ -1,4 +1,4 @@
-package org.godigit.trackwise.model;
+package org.godigit.trackwise.model.Enum;
 
 public enum AssetStatus {
   AVAILABLE,

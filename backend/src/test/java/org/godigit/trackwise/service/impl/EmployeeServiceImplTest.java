@@ -1,6 +1,6 @@
 package org.godigit.trackwise.service.impl;
 
-import org.godigit.trackwise.dto.EmployeeRequestDTO;
+import org.godigit.trackwise.dto.EmployeeRequest;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.model.Department;
 import org.godigit.trackwise.model.Employee;
@@ -40,7 +40,7 @@ class EmployeeServiceImplTest {
     private UUID departmentId;
     private Employee employee;
     private Department department;
-    private EmployeeRequestDTO employeeRequestDTO;
+    private EmployeeRequest employeeRequest;
 
     @BeforeEach
     void setUp() {
@@ -60,11 +60,11 @@ class EmployeeServiceImplTest {
         employee.setEmail("john.doe@example.com");
         employee.setDepartment(department);
 
-        employeeRequestDTO = new EmployeeRequestDTO();
-        employeeRequestDTO.setFirstName("John");
-        employeeRequestDTO.setLastName("Doe");
-        employeeRequestDTO.setEmail("john.doe@example.com");
-        employeeRequestDTO.setDepartmentId(departmentId);
+        employeeRequest = new EmployeeRequest();
+        employeeRequest.setFirstName("John");
+        employeeRequest.setLastName("Doe");
+        employeeRequest.setEmail("john.doe@example.com");
+        employeeRequest.setDepartmentId(departmentId);
     }
 
     @Test
@@ -74,7 +74,7 @@ class EmployeeServiceImplTest {
         when(employeeRepository.save(any(Employee.class))).thenReturn(employee);
 
         // Act
-        Employee result = employeeService.create(employeeRequestDTO);
+        Employee result = employeeService.create(employeeRequest);
 
         // Assert
         assertThat(result).isNotNull();
@@ -92,7 +92,7 @@ class EmployeeServiceImplTest {
         when(departmentRepository.findById(departmentId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> employeeService.create(employeeRequestDTO))
+        assertThatThrownBy(() -> employeeService.create(employeeRequest))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessageContaining("Department not found");
 
@@ -149,7 +149,7 @@ class EmployeeServiceImplTest {
     @Test
     void shouldUpdateEmployee() {
         // Arrange
-        EmployeeRequestDTO updateDTO = new EmployeeRequestDTO();
+        EmployeeRequest updateDTO = new EmployeeRequest();
         updateDTO.setFirstName("Jane");
         updateDTO.setLastName("Smith");
         updateDTO.setEmail("jane.smith@example.com");

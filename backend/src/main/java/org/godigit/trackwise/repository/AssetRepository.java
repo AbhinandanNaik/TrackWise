@@ -1,7 +1,7 @@
 package org.godigit.trackwise.repository;
 
 import org.godigit.trackwise.model.Asset;
-import org.godigit.trackwise.model.AssetStatus;
+import org.godigit.trackwise.model.Enum.AssetStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

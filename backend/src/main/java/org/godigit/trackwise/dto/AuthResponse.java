@@ -1,7 +1,5 @@
 package org.godigit.trackwise.dto;
 
-import lombok.Getter;
-
 public class AuthResponse {
     private String jwt;
 

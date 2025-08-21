@@ -1,12 +1,14 @@
 package org.godigit.trackwise.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.dto.AssetScanRequestDTO;
-import org.godigit.trackwise.dto.CheckInOutRequestDTO;
-import org.godigit.trackwise.dto.CheckInOutResponseDTO;
+import org.godigit.trackwise.dto.AssetScanRequest;
+import org.godigit.trackwise.dto.CheckInOutRequest;
+import org.godigit.trackwise.dto.CheckInOutResponse;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.mapper.CheckInOutMapper;
 import org.godigit.trackwise.model.*;
+import org.godigit.trackwise.model.Enum.AssetStatus;
+import org.godigit.trackwise.model.Enum.CheckInOutAction;
 import org.godigit.trackwise.repository.AssetRepository;
 import org.godigit.trackwise.repository.CheckInOutLogRepository;
 import org.godigit.trackwise.repository.EmployeeRepository;
@@ -32,7 +34,7 @@ public class CheckInOutServiceImpl implements CheckInOutService {
     private static final Logger log = LoggerFactory.getLogger(CheckInOutServiceImpl.class);
 
     @Override
-    public CheckInOutResponseDTO checkoutAsset(CheckInOutRequestDTO request) {
+    public CheckInOutResponse checkoutAsset(CheckInOutRequest request) {
         Asset asset = assetRepository.findById(request.getAssetId())
                 .orElseThrow(() -> new NotFoundException("Asset not found: " + request.getAssetId()));
         Employee emp = employeeRepository.findById(request.getEmployeeId())
@@ -58,7 +60,7 @@ public class CheckInOutServiceImpl implements CheckInOutService {
     }
 
     @Override
-    public CheckInOutResponseDTO checkinAsset(CheckInOutRequestDTO request) {
+    public CheckInOutResponse checkinAsset(CheckInOutRequest request) {
         // CORRECTED LOGIC: Find the existing checkout log and update it.
         CheckInOutLog logToUpdate = checkInOutLogRepository
                 .findFirstByAssetIdAndCheckInTimeIsNullOrderByCheckOutTimeDesc(request.getAssetId())
@@ -82,7 +84,7 @@ public class CheckInOutServiceImpl implements CheckInOutService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CheckInOutResponseDTO> historyByAsset(UUID assetId) {
+    public List<CheckInOutResponse> historyByAsset(UUID assetId) {
         return checkInOutLogRepository.findByAssetId(assetId)
                 .stream()
                 .map(CheckInOutMapper::toDTO)
@@ -91,18 +93,18 @@ public class CheckInOutServiceImpl implements CheckInOutService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CheckInOutResponseDTO> historyByEmployee(UUID employeeId) {
+    public List<CheckInOutResponse> historyByEmployee(UUID employeeId) {
         return checkInOutLogRepository.findByEmployeeId(employeeId)
                 .stream()
                 .map(CheckInOutMapper::toDTO)
                 .collect(Collectors.toList());
     }
     @Override
-    public CheckInOutResponseDTO processAssetScan(AssetScanRequestDTO request) {
+    public CheckInOutResponse processAssetScan(AssetScanRequest request) {
         Asset asset = assetRepository.findById(request.getAssetId())
                 .orElseThrow(() -> new NotFoundException("Asset not found: " + request.getAssetId()));
 
-        CheckInOutRequestDTO actionRequest = new CheckInOutRequestDTO();
+        CheckInOutRequest actionRequest = new CheckInOutRequest();
         actionRequest.setAssetId(request.getAssetId());
         actionRequest.setEmployeeId(request.getEmployeeId());
 

@@ -2,8 +2,8 @@ package org.godigit.trackwise.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.godigit.trackwise.config.SecurityConfig;
-import org.godigit.trackwise.dto.IoTDataRequestDTO;
-import org.godigit.trackwise.dto.IoTDataResponseDTO;
+import org.godigit.trackwise.dto.IoTDataRequest;
+import org.godigit.trackwise.dto.IoTDataResponse;
 import org.godigit.trackwise.service.IoTService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,8 +36,8 @@ class IoTControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private IoTDataRequestDTO sampleRequest() {
-        IoTDataRequestDTO request = new IoTDataRequestDTO();
+    private IoTDataRequest sampleRequest() {
+        IoTDataRequest request = new IoTDataRequest();
         request.setAssetId(UUID.randomUUID());
         request.setTemperature(25.5);
         request.setBatteryLevel(85.0);
@@ -47,8 +47,8 @@ class IoTControllerTest {
         return request;
     }
 
-    private IoTDataResponseDTO sampleResponse() {
-        IoTDataResponseDTO response = new IoTDataResponseDTO();
+    private IoTDataResponse sampleResponse() {
+        IoTDataResponse response = new IoTDataResponse();
         response.setLogId(UUID.randomUUID());
         response.setAssetId(UUID.randomUUID());
         response.setAssetName("Asset Name");
@@ -61,8 +61,8 @@ class IoTControllerTest {
 
     @Test
     void shouldIngestIoTData() throws Exception {
-        IoTDataRequestDTO request = sampleRequest();
-        IoTDataResponseDTO response = sampleResponse();
+        IoTDataRequest request = sampleRequest();
+        IoTDataResponse response = sampleResponse();
 
         when(iotService.ingest(Mockito.any())).thenReturn(response);
 
@@ -77,7 +77,7 @@ class IoTControllerTest {
     @Test
     void shouldProcessSensorData() throws Exception {
         UUID assetId = UUID.randomUUID();
-        IoTDataResponseDTO response = sampleResponse();
+        IoTDataResponse response = sampleResponse();
         response.setAssetId(assetId);
 
         when(iotService.processSensorData(

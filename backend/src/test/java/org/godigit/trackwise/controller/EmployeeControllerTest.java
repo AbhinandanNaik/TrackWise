@@ -2,8 +2,8 @@ package org.godigit.trackwise.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.godigit.trackwise.config.SecurityConfig;
-import org.godigit.trackwise.dto.EmployeeRequestDTO;
-import org.godigit.trackwise.dto.EmployeeResponseDTO;
+import org.godigit.trackwise.dto.EmployeeRequest;
+import org.godigit.trackwise.dto.EmployeeResponse;
 import org.godigit.trackwise.mapper.EmployeeMapper;
 import org.godigit.trackwise.model.Employee;
 import org.godigit.trackwise.service.EmployeeService;
@@ -41,8 +41,8 @@ class EmployeeControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private EmployeeRequestDTO sampleRequest() {
-        EmployeeRequestDTO request = new EmployeeRequestDTO();
+    private EmployeeRequest sampleRequest() {
+        EmployeeRequest request = new EmployeeRequest();
         request.setFirstName("John");
         request.setLastName("Doe");
         request.setEmail("john.doe@example.com");
@@ -61,9 +61,9 @@ class EmployeeControllerTest {
 
     @Test
     void shouldCreateEmployee() throws Exception {
-        EmployeeRequestDTO request = sampleRequest();
+        EmployeeRequest request = sampleRequest();
         Employee employee = sampleEmployee();
-        EmployeeResponseDTO response = EmployeeMapper.toDto(employee);
+        EmployeeResponse response = EmployeeMapper.toDto(employee);
 
         when(employeeService.create(Mockito.any())).thenReturn(employee);
 
@@ -105,7 +105,7 @@ class EmployeeControllerTest {
     @Test
     void shouldUpdateEmployee() throws Exception {
         UUID id = UUID.randomUUID();
-        EmployeeRequestDTO request = sampleRequest();
+        EmployeeRequest request = sampleRequest();
         Employee employee = sampleEmployee();
         employee.setId(id);
 

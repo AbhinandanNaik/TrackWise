@@ -1,8 +1,8 @@
 package org.godigit.trackwise.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.dto.WarrantyRequestDTO;
-import org.godigit.trackwise.dto.WarrantyResponseDTO;
+import org.godigit.trackwise.dto.WarrantyRequest;
+import org.godigit.trackwise.dto.WarrantyResponse;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.mapper.WarrantyMapper;
 import org.godigit.trackwise.model.Asset;
@@ -27,7 +27,7 @@ public class WarrantyServiceImpl implements WarrantyService {
   private final AssetRepository assetRepository; // Needed to link the asset
 
   @Override
-  public WarrantyResponseDTO createOrUpdate(WarrantyRequestDTO request) {
+  public WarrantyResponse createOrUpdate(WarrantyRequest request) {
     Asset asset = assetRepository.findById(request.getAssetId())
             .orElseThrow(() -> new NotFoundException("Asset not found: " + request.getAssetId()));
 
@@ -45,7 +45,7 @@ public class WarrantyServiceImpl implements WarrantyService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<WarrantyResponseDTO> findExpiringBetween(LocalDate from, LocalDate to) {
+  public List<WarrantyResponse> findExpiringBetween(LocalDate from, LocalDate to) {
     return warrantyRepository.findByEndDateBetween(from, to)
             .stream()
             .map(WarrantyMapper::toResponseDTO)
@@ -53,7 +53,7 @@ public class WarrantyServiceImpl implements WarrantyService {
   }
 
   @Override
-  public WarrantyResponseDTO extendWarranty(UUID warrantyId, LocalDate newEndDate) {
+  public WarrantyResponse extendWarranty(UUID warrantyId, LocalDate newEndDate) {
     Warranty w = warrantyRepository.findById(warrantyId)
             .orElseThrow(() -> new NotFoundException("Warranty not found: " + warrantyId));
     w.setEndDate(newEndDate);

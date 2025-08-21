@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
-public class CheckInOutResponseDTO {
+public class CheckInOutResponse {
     private UUID id;               // log id
     private UUID assetId;
     private String assetName;

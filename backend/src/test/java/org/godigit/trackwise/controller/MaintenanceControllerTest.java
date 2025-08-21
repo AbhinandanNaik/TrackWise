@@ -2,8 +2,8 @@ package org.godigit.trackwise.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.godigit.trackwise.config.SecurityConfig;
-import org.godigit.trackwise.dto.MaintenanceRequestDTO;
-import org.godigit.trackwise.dto.MaintenanceResponseDTO;
+import org.godigit.trackwise.dto.MaintenanceRequest;
+import org.godigit.trackwise.dto.MaintenanceResponse;
 import org.godigit.trackwise.service.MaintenanceService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -38,16 +38,16 @@ class MaintenanceControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private MaintenanceRequestDTO sampleRequest() {
-        MaintenanceRequestDTO request = new MaintenanceRequestDTO();
+    private MaintenanceRequest sampleRequest() {
+        MaintenanceRequest request = new MaintenanceRequest();
         request.setDescription("Regular maintenance check");
         request.setMaintenanceDate(LocalDate.now());
         request.setPerformedBy("John Technician");
         return request;
     }
 
-    private MaintenanceResponseDTO sampleResponse() {
-        MaintenanceResponseDTO response = new MaintenanceResponseDTO();
+    private MaintenanceResponse sampleResponse() {
+        MaintenanceResponse response = new MaintenanceResponse();
         response.setLogId(UUID.randomUUID());
         response.setAssetId(UUID.randomUUID());
         response.setAssetName("Test Asset");
@@ -60,8 +60,8 @@ class MaintenanceControllerTest {
     @Test
     void shouldAddMaintenance() throws Exception {
         UUID assetId = UUID.randomUUID();
-        MaintenanceRequestDTO request = sampleRequest();
-        MaintenanceResponseDTO response = sampleResponse();
+        MaintenanceRequest request = sampleRequest();
+        MaintenanceResponse response = sampleResponse();
         response.setAssetId(assetId);
 
         when(maintenanceService.addMaintenance(eq(assetId), Mockito.any())).thenReturn(response);
@@ -77,7 +77,7 @@ class MaintenanceControllerTest {
     @Test
     void shouldListMaintenanceByAsset() throws Exception {
         UUID assetId = UUID.randomUUID();
-        MaintenanceResponseDTO response = sampleResponse();
+        MaintenanceResponse response = sampleResponse();
         response.setAssetId(assetId);
 
         when(maintenanceService.listByAsset(assetId)).thenReturn(List.of(response));

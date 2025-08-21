@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
-public class NotificationResponseDTO {
+public class NotificationResponse {
     private UUID id;
     private UUID recipientId;
     private String recipientName;

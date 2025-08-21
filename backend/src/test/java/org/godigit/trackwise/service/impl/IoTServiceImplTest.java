@@ -1,7 +1,7 @@
 package org.godigit.trackwise.service.impl;
 
-import org.godigit.trackwise.dto.IoTDataRequestDTO;
-import org.godigit.trackwise.dto.IoTDataResponseDTO;
+import org.godigit.trackwise.dto.IoTDataRequest;
+import org.godigit.trackwise.dto.IoTDataResponse;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.model.Asset;
 import org.godigit.trackwise.model.IoTData;
@@ -10,7 +10,6 @@ import org.godigit.trackwise.repository.IoTDataRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,9 +18,6 @@ import org.springframework.scheduling.TaskScheduler;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -56,7 +52,7 @@ public class IoTServiceImplTest {
 
     private Asset testAsset;
     private IoTData testIoTData;
-    private IoTDataRequestDTO testRequestDTO;
+    private IoTDataRequest testRequestDTO;
     private UUID assetId;
 
     @BeforeEach
@@ -80,7 +76,7 @@ public class IoTServiceImplTest {
         testIoTData.setTimestamp(Instant.now());
 
         // Setup test request DTO
-        testRequestDTO = new IoTDataRequestDTO();
+        testRequestDTO = new IoTDataRequest();
         testRequestDTO.setAssetId(assetId);
         testRequestDTO.setTemperature(25.5);
         testRequestDTO.setBatteryLevel(75.0);
@@ -96,7 +92,7 @@ public class IoTServiceImplTest {
         when(iotDataRepository.save(any(IoTData.class))).thenReturn(testIoTData);
 
         // Act
-        IoTDataResponseDTO response = iotService.ingest(testRequestDTO);
+        IoTDataResponse response = iotService.ingest(testRequestDTO);
 
         // Assert
         assertThat(response).isNotNull();
@@ -110,7 +106,7 @@ public class IoTServiceImplTest {
         // Verify interactions
         verify(assetRepository).findById(assetId);
         verify(iotDataRepository).save(any(IoTData.class));
-        verify(messagingTemplate).convertAndSend(eq("/topic/asset-locations"), any(IoTDataResponseDTO.class));
+        verify(messagingTemplate).convertAndSend(eq("/topic/asset-locations"), any(IoTDataResponse.class));
     }
 
     @Test
@@ -134,7 +130,7 @@ public class IoTServiceImplTest {
         when(iotDataRepository.save(any(IoTData.class))).thenReturn(testIoTData);
 
         // Act
-        IoTDataResponseDTO response = iotService.processSensorData(
+        IoTDataResponse response = iotService.processSensorData(
                 assetId, 25.5, 75.0, true, 12.9716, 77.5946);
 
         // Assert
@@ -149,7 +145,7 @@ public class IoTServiceImplTest {
         // Verify interactions
         verify(assetRepository).findById(assetId);
         verify(iotDataRepository).save(any(IoTData.class));
-        verify(messagingTemplate).convertAndSend(eq("/topic/asset-locations"), any(IoTDataResponseDTO.class));
+        verify(messagingTemplate).convertAndSend(eq("/topic/asset-locations"), any(IoTDataResponse.class));
     }
 
     @Test

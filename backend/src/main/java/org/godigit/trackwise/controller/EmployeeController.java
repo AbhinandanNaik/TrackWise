@@ -1,8 +1,8 @@
 package org.godigit.trackwise.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.dto.EmployeeRequestDTO;
-import org.godigit.trackwise.dto.EmployeeResponseDTO;
+import org.godigit.trackwise.dto.EmployeeRequest;
+import org.godigit.trackwise.dto.EmployeeResponse;
 import org.godigit.trackwise.mapper.EmployeeMapper;
 import org.godigit.trackwise.model.Employee;
 import org.godigit.trackwise.service.EmployeeService;
@@ -24,30 +24,30 @@ public class EmployeeController {
 
     // ✅ Create
     @PostMapping
-    public ResponseEntity<EmployeeResponseDTO> createEmployee(@RequestBody EmployeeRequestDTO requestDTO) {
+    public ResponseEntity<EmployeeResponse> createEmployee(@RequestBody EmployeeRequest requestDTO) {
         Employee created = employeeService.create(requestDTO);
         return new ResponseEntity<>(EmployeeMapper.toDto(created), HttpStatus.CREATED);
     }
 
     // ✅ Get by ID
     @GetMapping("/{id}")
-    public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable UUID id) {
+    public ResponseEntity<EmployeeResponse> getEmployee(@PathVariable UUID id) {
         Employee employee = employeeService.getById(id);
         return ResponseEntity.ok(EmployeeMapper.toDto(employee));
     }
 
     // ✅ List with pagination
     @GetMapping
-    public ResponseEntity<Page<EmployeeResponseDTO>> listEmployees(Pageable pageable) {
-        Page<EmployeeResponseDTO> employees = employeeService.list(pageable)
+    public ResponseEntity<Page<EmployeeResponse>> listEmployees(Pageable pageable) {
+        Page<EmployeeResponse> employees = employeeService.list(pageable)
                 .map(EmployeeMapper::toDto);
         return ResponseEntity.ok(employees);
     }
 
     // ✅ Update
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable UUID id,
-                                                              @RequestBody EmployeeRequestDTO requestDTO) {
+    public ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable UUID id,
+                                                           @RequestBody EmployeeRequest requestDTO) {
         Employee updated = employeeService.update(id, requestDTO);
         return ResponseEntity.ok(EmployeeMapper.toDto(updated));
     }
@@ -61,7 +61,7 @@ public class EmployeeController {
 
     // ✅ Find by email
     @GetMapping("/search")
-    public ResponseEntity<EmployeeResponseDTO> findByEmail(@RequestParam String email) {
+    public ResponseEntity<EmployeeResponse> findByEmail(@RequestParam String email) {
         Optional<Employee> employeeOpt = employeeService.findByEmail(email);
         return employeeOpt
                 .map(employee -> ResponseEntity.ok(EmployeeMapper.toDto(employee)))

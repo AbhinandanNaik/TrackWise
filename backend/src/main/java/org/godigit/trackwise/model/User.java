@@ -1,15 +1,16 @@
 package org.godigit.trackwise.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.godigit.trackwise.model.Enum.UserStatus;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
 @ToString
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -24,16 +25,13 @@ public class User {
 
     private String role; // e.g., "ROLE_ADMIN", "ROLE_USER"
 
-    // Constructors
-    public User() {}
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "employee_id", referencedColumnName = "id")
+    private Employee employee;
 
-    public User(String username, String password, String role) {
-        this.username = username;
-        this.password = password;
-        this.role = role;
-    }
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status;
 
-    // Getters and Setters
-    // ...
 }
 

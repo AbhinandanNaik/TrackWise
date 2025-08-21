@@ -1,0 +1,152 @@
+[33mcommit 502ced61812b28f158abcd2fde65bb7026d1ff04[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Thu Aug 21 00:26:01 2025 +0530
+
+    Fix .gitignore and remove secrets
+
+[33mcommit 29ccabce4a3525012a7624d372a2cda3b2102354[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Wed Aug 20 22:19:54 2025 +0530
+
+    Clean secrets and move to env
+
+[33mcommit 4eb29c6377af699a1453b873d8acf0eba173b4ff[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Wed Aug 20 22:14:33 2025 +0530
+
+    Clean secrets: move configs to .env and add example file
+
+[33mcommit 4ea5dec411ec494a36bbdc5ce515aa1a2d9b3b61[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Wed Aug 20 22:00:30 2025 +0530
+
+    Ignore application.properties
+
+[33mcommit 6069b50f851a4e6521307fc140ed7e3a44cb2415[m
+Merge: 7c1185f 76c0ba6
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Wed Aug 20 21:55:50 2025 +0530
+
+    sample work
+
+[33mcommit 7c1185ff479bd59049a931b3dd0bfb94700df8c1[m
+Merge: e2c8e7c cf93c24
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Wed Aug 20 21:54:54 2025 +0530
+
+    sample work
+
+[33mcommit 76c0ba6f44b0a495fc0d400a28746e8268fb7663[m
+Author: abhinandannaik1717 <abhinandannaik1717@gmail.com>
+Date:   Wed Aug 20 21:45:22 2025 +0530
+
+    added jwt feature
+
+[33mcommit cf93c2466864df78eae7e97970274f032575c7ec[m
+Author: abhinandannaik1717 <abhinandannaik1717@gmail.com>
+Date:   Tue Aug 19 16:06:41 2025 +0530
+
+    Added ALl the Unit Test Classes
+
+[33mcommit 57df753c98818f6253dfb03c61207871f211b1d8[m
+Merge: e2c8e7c 22dfa14
+Author: rajukumar2k04 <rajukumar2k04@gmail.com>
+Date:   Tue Aug 19 15:06:39 2025 +0530
+
+    Merged raju into main, excluding MailConfig.java
+
+[33mcommit 22dfa14081870b907373b740853bd992e1308ee5[m
+Author: rajukumar2k04 <rajukumar2k04@gmail.com>
+Date:   Tue Aug 19 13:12:56 2025 +0530
+
+    controllers and services test classes
+
+[33mcommit e2c8e7cdbe62fdb8876ec9366b22d1b44ec6489b[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Mon Aug 18 23:32:55 2025 +0530
+
+    Integrated OpenAI
+
+[33mcommit eb57571efc4c2df9e724d07d84dd73cd3e38db62[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Mon Aug 18 22:38:21 2025 +0530
+
+    added news api feature
+
+[33mcommit 1d8704349fa04bce6848306f3aabf68f58c11e45[m
+Author: abhinandannaik1717 <abhinandannaik1717@gmail.com>
+Date:   Mon Aug 18 15:38:40 2025 +0530
+
+    Added NewsService
+
+[33mcommit 3f4067c251be59eeb6936801f4d9c286e3800c41[m
+Author: rajukumar2k04 <rajukumar2k04@gmail.com>
+Date:   Mon Aug 18 14:32:47 2025 +0530
+
+    added test class and frontend react
+
+[33mcommit d1ce63be3ebce52a50d6a76baa38bf4a4663ced7[m
+Author: rajukumar2k04 <rajukumar2k04@gmail.com>
+Date:   Mon Aug 18 10:32:38 2025 +0530
+
+    update checkinoutcontroller
+
+[33mcommit fbf4cdc011f3e40904401b10bc5493fd44ab77ce[m
+Author: rajukumar2k04 <rajukumar2k04@gmail.com>
+Date:   Mon Aug 18 10:18:31 2025 +0530
+
+    mailCongig update
+
+[33mcommit 06e372ce21ce72d28dabfa0509c2b06903af7888[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Sun Aug 17 23:23:59 2025 +0530
+
+    added automated check in out feature
+
+[33mcommit cebf0f2dc2308b7de9545f6199ffaacefb58a084[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Sun Aug 17 20:50:28 2025 +0530
+
+    added all mapper and dto
+
+[33mcommit 2f05ef773926fe731a2d2e98f8ba1b6d822e54ad[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Sun Aug 17 13:33:44 2025 +0530
+
+    first running version
+
+[33mcommit 2f17096f3a7af27cc7e15790aaf9664944b10397[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Sun Aug 17 00:07:17 2025 +0530
+
+    added some dto
+
+[33mcommit 66297fa78d53f0a20536cda3bb3c0bc46bfe7788[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Sat Aug 16 23:40:46 2025 +0530
+
+    added config files
+
+[33mcommit 687b7f467efa3ff0f6f6a66c010c4946467317ad[m
+Author: Abhinandan Naik <147435815+AbhinandanNaik@users.noreply.github.com>
+Date:   Sat Aug 16 23:29:54 2025 +0530
+
+    Delete backend/src/main/java/com/company/trackwise/controller directory
+
+[33mcommit 64626742cfcfa925a8a6eed2d18d5b5995de1665[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Sat Aug 16 23:28:53 2025 +0530
+
+    added controller
+
+[33mcommit ec82e2952de564013fa0f139425e1e6319246eea[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Sat Aug 16 23:08:40 2025 +0530
+
+    Added Controllers
+
+[33mcommit 73254cdcf43dbccc9d8a3a6c2bff9b9ef94dbc5c[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m
+Author: abhinandan <abhinandannaik1717@gmail.com>
+Date:   Sat Aug 16 14:59:33 2025 +0530
+
+    second commit

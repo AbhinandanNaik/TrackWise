@@ -1,7 +1,7 @@
 package org.godigit.trackwise.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.dto.EmployeeRequestDTO;
+import org.godigit.trackwise.dto.EmployeeRequest;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.mapper.EmployeeMapper;
 import org.godigit.trackwise.model.Department;
@@ -26,7 +26,7 @@ public class EmployeeServiceImpl implements EmployeeService {
   private final DepartmentRepository departmentRepository; // ✅ needed to resolve dept
 
   @Override
-  public Employee create(EmployeeRequestDTO dto) {
+  public Employee create(EmployeeRequest dto) {
     Department dept = null;
     if (dto.getDepartmentId() != null) {
       dept = departmentRepository.findById(dto.getDepartmentId())
@@ -50,7 +50,7 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   @Override
-  public Employee update(UUID id, EmployeeRequestDTO dto) {
+  public Employee update(UUID id, EmployeeRequest dto) {
     Employee existing = getById(id);
 
     Department dept = null;
@@ -78,5 +78,18 @@ public class EmployeeServiceImpl implements EmployeeService {
   @Transactional(readOnly = true)
   public Optional<Employee> findByEmail(String email) {
     return employeeRepository.findByEmail(email);
+  }
+
+  @Override
+  public Employee assignDepartment(UUID employeeId, UUID departmentId) {
+    Employee employee = employeeRepository.findById(employeeId)
+            .orElseThrow(() -> new NotFoundException("Employee not found"));
+
+    Department department = departmentRepository.findById(departmentId)
+            .orElseThrow(() -> new NotFoundException("Department not found"));
+
+    employee.setDepartment(department); // Assign the actual Department object
+
+    return employeeRepository.save(employee);
   }
 }

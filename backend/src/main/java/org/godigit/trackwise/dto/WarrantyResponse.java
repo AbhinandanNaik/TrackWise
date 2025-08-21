@@ -5,8 +5,10 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Data
-public class WarrantyRequestDTO {
+public class WarrantyResponse {
+    private UUID warrantyId;
     private UUID assetId;
+    private String assetName;
     private LocalDate startDate;
     private LocalDate endDate;
     private String vendor;

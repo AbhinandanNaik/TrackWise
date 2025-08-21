@@ -2,9 +2,9 @@ package org.godigit.trackwise.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.godigit.trackwise.config.SecurityConfig;
-import org.godigit.trackwise.dto.AssetScanRequestDTO;
-import org.godigit.trackwise.dto.CheckInOutRequestDTO;
-import org.godigit.trackwise.dto.CheckInOutResponseDTO;
+import org.godigit.trackwise.dto.AssetScanRequest;
+import org.godigit.trackwise.dto.CheckInOutRequest;
+import org.godigit.trackwise.dto.CheckInOutResponse;
 import org.godigit.trackwise.service.CheckInOutService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -20,7 +20,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -38,15 +37,15 @@ class CheckInOutControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private CheckInOutRequestDTO sampleRequest() {
-        CheckInOutRequestDTO dto = new CheckInOutRequestDTO();
+    private CheckInOutRequest sampleRequest() {
+        CheckInOutRequest dto = new CheckInOutRequest();
         dto.setAssetId(UUID.randomUUID());
         dto.setEmployeeId(UUID.randomUUID());
         return dto;
     }
 
-    private CheckInOutResponseDTO sampleResponse(UUID logId) {
-        CheckInOutResponseDTO dto = new CheckInOutResponseDTO();
+    private CheckInOutResponse sampleResponse(UUID logId) {
+        CheckInOutResponse dto = new CheckInOutResponse();
         dto.setId(logId);
         dto.setAssetId(UUID.randomUUID());
         dto.setAssetName("Laptop");
@@ -59,8 +58,8 @@ class CheckInOutControllerTest {
 
     @Test
     void shouldCheckoutAsset() throws Exception {
-        CheckInOutRequestDTO request = sampleRequest();
-        CheckInOutResponseDTO response = sampleResponse(UUID.randomUUID());
+        CheckInOutRequest request = sampleRequest();
+        CheckInOutResponse response = sampleResponse(UUID.randomUUID());
 
         Mockito.when(checkInOutService.checkoutAsset(Mockito.any())).thenReturn(response);
 
@@ -74,8 +73,8 @@ class CheckInOutControllerTest {
 
     @Test
     void shouldCheckinAsset() throws Exception {
-        CheckInOutRequestDTO request = sampleRequest();
-        CheckInOutResponseDTO response = sampleResponse(UUID.randomUUID());
+        CheckInOutRequest request = sampleRequest();
+        CheckInOutResponse response = sampleResponse(UUID.randomUUID());
         response.setCheckInTime(Instant.now());
 
         Mockito.when(checkInOutService.checkinAsset(Mockito.any())).thenReturn(response);
@@ -90,7 +89,7 @@ class CheckInOutControllerTest {
     @Test
     void shouldReturnHistoryByAsset() throws Exception {
         UUID assetId = UUID.randomUUID();
-        CheckInOutResponseDTO response = sampleResponse(UUID.randomUUID());
+        CheckInOutResponse response = sampleResponse(UUID.randomUUID());
 
         Mockito.when(checkInOutService.historyByAsset(assetId)).thenReturn(List.of(response));
 
@@ -102,7 +101,7 @@ class CheckInOutControllerTest {
     @Test
     void shouldReturnHistoryByEmployee() throws Exception {
         UUID employeeId = UUID.randomUUID();
-        CheckInOutResponseDTO response = sampleResponse(UUID.randomUUID());
+        CheckInOutResponse response = sampleResponse(UUID.randomUUID());
 
         Mockito.when(checkInOutService.historyByEmployee(employeeId)).thenReturn(List.of(response));
 
@@ -113,11 +112,11 @@ class CheckInOutControllerTest {
 
     @Test
     void shouldProcessScan() throws Exception {
-        AssetScanRequestDTO request = new AssetScanRequestDTO();
+        AssetScanRequest request = new AssetScanRequest();
         request.setAssetId(UUID.randomUUID());
         request.setEmployeeId(UUID.randomUUID());
 
-        CheckInOutResponseDTO response = sampleResponse(UUID.randomUUID());
+        CheckInOutResponse response = sampleResponse(UUID.randomUUID());
 
         Mockito.when(checkInOutService.processAssetScan(Mockito.any())).thenReturn(response);
 

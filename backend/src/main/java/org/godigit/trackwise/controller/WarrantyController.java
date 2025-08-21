@@ -1,8 +1,8 @@
 package org.godigit.trackwise.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.dto.WarrantyRequestDTO;
-import org.godigit.trackwise.dto.WarrantyResponseDTO;
+import org.godigit.trackwise.dto.WarrantyRequest;
+import org.godigit.trackwise.dto.WarrantyResponse;
 import org.godigit.trackwise.service.WarrantyService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -22,26 +22,26 @@ public class WarrantyController {
 
     // Create or update a warranty using a DTO
     @PostMapping
-    public ResponseEntity<WarrantyResponseDTO> createOrUpdate(@RequestBody WarrantyRequestDTO request) {
-        WarrantyResponseDTO savedDto = warrantyService.createOrUpdate(request);
+    public ResponseEntity<WarrantyResponse> createOrUpdate(@RequestBody WarrantyRequest request) {
+        WarrantyResponse savedDto = warrantyService.createOrUpdate(request);
         return new ResponseEntity<>(savedDto, HttpStatus.CREATED);
     }
 
     // Find warranties expiring between two dates
     @GetMapping("/expiring")
-    public ResponseEntity<List<WarrantyResponseDTO>> findExpiringBetween(
+    public ResponseEntity<List<WarrantyResponse>> findExpiringBetween(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        List<WarrantyResponseDTO> list = warrantyService.findExpiringBetween(from, to);
+        List<WarrantyResponse> list = warrantyService.findExpiringBetween(from, to);
         return ResponseEntity.ok(list);
     }
 
     // Extend warranty end date
     @PutMapping("/{id}/extend")
-    public ResponseEntity<WarrantyResponseDTO> extendWarranty(
+    public ResponseEntity<WarrantyResponse> extendWarranty(
             @PathVariable("id") UUID warrantyId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate newEndDate) {
-        WarrantyResponseDTO extendedWarranty = warrantyService.extendWarranty(warrantyId, newEndDate);
+        WarrantyResponse extendedWarranty = warrantyService.extendWarranty(warrantyId, newEndDate);
         return ResponseEntity.ok(extendedWarranty);
     }
 }

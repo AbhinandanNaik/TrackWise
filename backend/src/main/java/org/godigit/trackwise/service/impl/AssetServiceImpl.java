@@ -6,6 +6,7 @@ import org.godigit.trackwise.dto.AssetResponse;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.mapper.AssetMapper;
 import org.godigit.trackwise.model.*;
+import org.godigit.trackwise.model.Enum.AssetStatus;
 import org.godigit.trackwise.repository.*;
 import org.godigit.trackwise.service.AssetService;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 

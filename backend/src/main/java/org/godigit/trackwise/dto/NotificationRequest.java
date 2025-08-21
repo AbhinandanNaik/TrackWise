@@ -4,7 +4,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class NotificationRequestDTO {
+public class NotificationRequest {
     private UUID recipientId;
     private String message;
 }

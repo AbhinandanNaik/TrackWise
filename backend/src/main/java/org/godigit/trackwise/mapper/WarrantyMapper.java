@@ -1,16 +1,16 @@
 package org.godigit.trackwise.mapper;
 
-import org.godigit.trackwise.dto.WarrantyResponseDTO;
+import org.godigit.trackwise.dto.WarrantyResponse;
 import org.godigit.trackwise.model.Warranty;
 
 public class WarrantyMapper {
 
-    public static WarrantyResponseDTO toResponseDTO(Warranty warranty) {
+    public static WarrantyResponse toResponseDTO(Warranty warranty) {
         if (warranty == null) {
             return null;
         }
 
-        WarrantyResponseDTO dto = new WarrantyResponseDTO();
+        WarrantyResponse dto = new WarrantyResponse();
         dto.setWarrantyId(warranty.getId());
         dto.setStartDate(warranty.getStartDate());
         dto.setEndDate(warranty.getEndDate());

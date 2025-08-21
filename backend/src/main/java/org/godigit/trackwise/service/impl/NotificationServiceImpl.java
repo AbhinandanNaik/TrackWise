@@ -2,9 +2,9 @@ package org.godigit.trackwise.service.impl;
 
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.dto.EmailRequestDTO;
-import org.godigit.trackwise.dto.NotificationRequestDTO;
-import org.godigit.trackwise.dto.NotificationResponseDTO;
+import org.godigit.trackwise.dto.EmailRequest;
+import org.godigit.trackwise.dto.NotificationRequest;
+import org.godigit.trackwise.dto.NotificationResponse;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.mapper.NotificationMapper;
 import org.godigit.trackwise.model.Employee;
@@ -27,7 +27,7 @@ public class NotificationServiceImpl implements NotificationService {
   private final JavaMailSender mailSender;
 
   @Override
-  public NotificationResponseDTO createInAppNotification(NotificationRequestDTO request) {
+  public NotificationResponse createInAppNotification(NotificationRequest request) {
     Employee recipient = employeeRepository.findById(request.getRecipientId())
             .orElseThrow(() -> new NotFoundException("Employee not found: " + request.getRecipientId()));
 
@@ -41,7 +41,7 @@ public class NotificationServiceImpl implements NotificationService {
   }
 
   @Override
-  public void sendEmail(EmailRequestDTO request) {
+  public void sendEmail(EmailRequest request) {
     SimpleMailMessage msg = new SimpleMailMessage();
     msg.setTo(request.getTo());
     msg.setSubject(request.getSubject());

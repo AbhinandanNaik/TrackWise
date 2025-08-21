@@ -2,7 +2,7 @@ package org.godigit.trackwise.service;
 
 import org.godigit.trackwise.dto.AssetRequest;
 import org.godigit.trackwise.dto.AssetResponse;
-import org.godigit.trackwise.model.AssetStatus;
+import org.godigit.trackwise.model.Enum.AssetStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

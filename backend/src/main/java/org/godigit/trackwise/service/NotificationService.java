@@ -1,10 +1,10 @@
 package org.godigit.trackwise.service;
 
-import org.godigit.trackwise.dto.EmailRequestDTO;
-import org.godigit.trackwise.dto.NotificationRequestDTO;
-import org.godigit.trackwise.dto.NotificationResponseDTO;
+import org.godigit.trackwise.dto.EmailRequest;
+import org.godigit.trackwise.dto.NotificationRequest;
+import org.godigit.trackwise.dto.NotificationResponse;
 
 public interface NotificationService {
-  NotificationResponseDTO createInAppNotification(NotificationRequestDTO request);
-  void sendEmail(EmailRequestDTO request);
+  NotificationResponse createInAppNotification(NotificationRequest request);
+  void sendEmail(EmailRequest request);
 }

@@ -3,10 +3,11 @@ package org.godigit.trackwise.controller;
 import lombok.RequiredArgsConstructor;
 import org.godigit.trackwise.job.AssetPerformanceAnalysisJob;
 import org.godigit.trackwise.job.NewsScannerJob;
+import org.godigit.trackwise.service.EmployeeService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/jobs")
@@ -15,6 +16,7 @@ public class AdminController {
 
     private final NewsScannerJob newsScannerJob;
     private final AssetPerformanceAnalysisJob assetPerformanceAnalysisJob;
+    private final EmployeeService employeeService;
 
     // This endpoint manually triggers the job's logic
     @PostMapping("/run-news-scan")
@@ -28,6 +30,16 @@ public class AdminController {
     public ResponseEntity<String> runPerformanceAnalysisNow() {
         assetPerformanceAnalysisJob.executeInternal(null);
         return ResponseEntity.ok("Asset performance analysis job triggered manually.");
+    }
+
+
+    @PutMapping("/employees/{employeeId}/assign-department")
+    public ResponseEntity<Void> assignDepartment(
+            @PathVariable UUID employeeId,
+            @RequestParam UUID departmentId) {
+
+        employeeService.assignDepartment(employeeId, departmentId);
+        return ResponseEntity.ok().build();
     }
 
 

@@ -1,16 +1,16 @@
 package org.godigit.trackwise.mapper;
 
-import org.godigit.trackwise.dto.MaintenanceResponseDTO;
+import org.godigit.trackwise.dto.MaintenanceResponse;
 import org.godigit.trackwise.model.MaintenanceLog;
 
 public class MaintenanceMapper {
 
-    public static MaintenanceResponseDTO toResponseDTO(MaintenanceLog log) {
+    public static MaintenanceResponse toResponseDTO(MaintenanceLog log) {
         if (log == null) {
             return null;
         }
 
-        MaintenanceResponseDTO dto = new MaintenanceResponseDTO();
+        MaintenanceResponse dto = new MaintenanceResponse();
         dto.setLogId(log.getId());
         dto.setDescription(log.getDescription());
         dto.setMaintenanceDate(log.getMaintenanceDate());

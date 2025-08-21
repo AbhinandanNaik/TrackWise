@@ -1,16 +1,16 @@
 package org.godigit.trackwise.mapper;
 
-import org.godigit.trackwise.dto.IoTDataResponseDTO;
+import org.godigit.trackwise.dto.IoTDataResponse;
 import org.godigit.trackwise.model.IoTData;
 
 public class IoTDataMapper {
 
-    public static IoTDataResponseDTO toResponseDTO(IoTData data) {
+    public static IoTDataResponse toResponseDTO(IoTData data) {
         if (data == null) {
             return null;
         }
 
-        IoTDataResponseDTO dto = new IoTDataResponseDTO();
+        IoTDataResponse dto = new IoTDataResponse();
         dto.setLogId(data.getId());
         dto.setTimestamp(data.getTimestamp());
         dto.setTemperature(data.getTemperature());

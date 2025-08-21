@@ -2,12 +2,12 @@ package org.godigit.trackwise.service.impl;
 
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.dto.MaintenanceRequestDTO;
-import org.godigit.trackwise.dto.MaintenanceResponseDTO;
+import org.godigit.trackwise.dto.MaintenanceRequest;
+import org.godigit.trackwise.dto.MaintenanceResponse;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.mapper.MaintenanceMapper;
 import org.godigit.trackwise.model.Asset;
-import org.godigit.trackwise.model.AssetStatus;
+import org.godigit.trackwise.model.Enum.AssetStatus;
 import org.godigit.trackwise.model.MaintenanceLog;
 import org.godigit.trackwise.repository.AssetRepository;
 import org.godigit.trackwise.repository.MaintenanceLogRepository;
@@ -28,7 +28,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
   private final AssetRepository assetRepository;
 
   @Override
-  public MaintenanceResponseDTO addMaintenance(UUID assetId, MaintenanceRequestDTO request) {
+  public MaintenanceResponse addMaintenance(UUID assetId, MaintenanceRequest request) {
     Asset asset = assetRepository.findById(assetId)
             .orElseThrow(() -> new NotFoundException("Asset not found: " + assetId));
 
@@ -48,7 +48,7 @@ public class MaintenanceServiceImpl implements MaintenanceService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<MaintenanceResponseDTO> listByAsset(UUID assetId) {
+  public List<MaintenanceResponse> listByAsset(UUID assetId) {
     return maintenanceLogRepository.findByAssetId(assetId)
             .stream()
             .map(MaintenanceMapper::toResponseDTO)

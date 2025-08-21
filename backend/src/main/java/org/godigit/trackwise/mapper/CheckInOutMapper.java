@@ -1,12 +1,12 @@
 package org.godigit.trackwise.mapper;
 
-import org.godigit.trackwise.dto.CheckInOutResponseDTO;
+import org.godigit.trackwise.dto.CheckInOutResponse;
 import org.godigit.trackwise.model.CheckInOutLog;
 
 public class CheckInOutMapper {
 
-    public static CheckInOutResponseDTO toDTO(CheckInOutLog log) {
-        CheckInOutResponseDTO dto = new CheckInOutResponseDTO();
+    public static CheckInOutResponse toDTO(CheckInOutLog log) {
+        CheckInOutResponse dto = new CheckInOutResponse();
         dto.setId(log.getId());
         dto.setAssetId(log.getAsset().getId());
         dto.setAssetName(log.getAsset().getName()); // assumes Asset has `name`

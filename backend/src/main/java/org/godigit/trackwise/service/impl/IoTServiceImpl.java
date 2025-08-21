@@ -1,8 +1,8 @@
 package org.godigit.trackwise.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.dto.IoTDataRequestDTO;
-import org.godigit.trackwise.dto.IoTDataResponseDTO;
+import org.godigit.trackwise.dto.IoTDataRequest;
+import org.godigit.trackwise.dto.IoTDataResponse;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.mapper.IoTDataMapper;
 import org.godigit.trackwise.model.Asset;
@@ -40,7 +40,7 @@ public class IoTServiceImpl implements IoTService {
   private final AtomicBoolean simulatorRunning = new AtomicBoolean(false);
 
   @Override
-  public IoTDataResponseDTO ingest(IoTDataRequestDTO request) {
+  public IoTDataResponse ingest(IoTDataRequest request) {
     Asset asset = assetRepository.findById(request.getAssetId())
             .orElseThrow(() -> new NotFoundException("Asset not found: " + request.getAssetId()));
 
@@ -68,7 +68,7 @@ public class IoTServiceImpl implements IoTService {
   }
 
   @Override
-  public IoTDataResponseDTO processSensorData(UUID assetId, Double temperature, Double batteryLevel, Boolean inUse, Double latitude, Double longitude) {
+  public IoTDataResponse processSensorData(UUID assetId, Double temperature, Double batteryLevel, Boolean inUse, Double latitude, Double longitude) {
     Asset asset = assetRepository.findById(assetId)
             .orElseThrow(() -> new NotFoundException("Asset not found: " + assetId));
 
