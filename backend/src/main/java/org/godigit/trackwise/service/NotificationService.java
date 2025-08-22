@@ -7,4 +7,5 @@ import org.godigit.trackwise.dto.NotificationResponse;
 public interface NotificationService {
   NotificationResponse createInAppNotification(NotificationRequest request);
   void sendEmail(EmailRequest request);
+  public void sendNewsAlertToAdmins(String title, String description);
 }
