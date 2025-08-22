@@ -2,10 +2,11 @@ import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import '../style/Login.css'
+import '../style/global.css'
 
 export default function Login() {
   const { login } = useAuth()
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -16,7 +17,7 @@ export default function Login() {
     setError(null)
     setLoading(true)
     try {
-      await login(email, password)
+      await login(username, password)
       nav('/')
     } catch (err: any) {
       setError(err.message || 'Login failed')
@@ -31,14 +32,8 @@ export default function Login() {
         <h2 className="login-title">Welcome Back</h2>
         <form onSubmit={onSubmit} className="login-form">
           <div className="form-group">
-            <label>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              placeholder="you@example.com"
-            />
+            <label>Username</label>
+            <input value={username} onChange={e => setUsername(e.target.value)} required placeholder="username" />
           </div>
           <div className="form-group">
             <label>Password</label>

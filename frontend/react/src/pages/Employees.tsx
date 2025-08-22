@@ -2,35 +2,68 @@ import { useEffect, useState, FormEvent } from 'react'
 import * as svc from '../services/employeeService'
 
 export default function Employees(){
-  const [items, setItems] = useState<svc.Employee[]>([])
-  const [form, setForm] = useState<svc.Employee>({ name:'', email:'' } as any)
+  const [page, setPage] = useState(0)
+  const [items, setItems] = useState<svc.EmployeeResponseDTO[]>([])
+  const [total, setTotal] = useState(0)
+  const [form, setForm] = useState<svc.EmployeeRequestDTO>({ firstName:'', lastName:'', email:'', phone:'', departmentId: undefined })
+  const [searchEmail, setSearchEmail] = useState('')
+  const [searchResult, setSearchResult] = useState<svc.EmployeeResponseDTO | null>(null)
+  const [editing, setEditing] = useState<svc.EmployeeResponseDTO | null>(null)
 
-  function load(){ svc.list().then(setItems).catch(()=>setItems([])) }
-  useEffect(load, [])
+  function load(){ svc.list(page, 20).then(p=>{ setItems(p.content); setTotal(p.totalElements) }).catch(()=>{ setItems([]); setTotal(0) }) }
+  useEffect(load, [page])
 
-  function onCreate(e:FormEvent){ e.preventDefault(); svc.create(form).then(()=>{ setForm({ name:'', email:'' } as any); load() }) }
-  function onUpdate(u:svc.Employee){
-    const name = prompt('New name', u.name) || u.name
-    svc.update(u.id!, { name }).then(load)
-  }
-  function onDelete(u:svc.Employee){ if(confirm('Delete employee?')) svc.remove(u.id!).then(load) }
+  function onCreate(e:FormEvent){ e.preventDefault(); svc.create(form).then(()=>{ setForm({ firstName:'', lastName:'', email:'' }); load() }) }
+  function onUpdate(u:svc.EmployeeResponseDTO){ setEditing(u) }
+  function onDelete(u:svc.EmployeeResponseDTO){ if(confirm('Delete employee?')) svc.remove(u.id).then(load) }
 
   return <div className="grid-2">
     <div className="card">
       <h3>Employees</h3>
       <table><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Dept</th><th>Actions</th></tr></thead>
       <tbody>
-        {items.map(u=>(<tr key={u.id}><td>{u.id}</td><td>{u.name}</td><td>{u.email}</td><td>{u.department||'-'}</td>
+        {items.map(u=>(<tr key={u.id}><td>{u.id}</td><td>{u.firstName} {u.lastName}</td><td>{u.email}</td><td>{u.departmentName||'-'}</td>
         <td><button onClick={()=>onUpdate(u)}>Edit</button> <button onClick={()=>onDelete(u)}>Delete</button></td></tr>))}
         {!items.length && <tr><td colSpan={5} className="small">No employees</td></tr>}
       </tbody></table>
+      <div className="small" style={{display:'flex', gap:8, alignItems:'center'}}>
+        <button disabled={page===0} onClick={()=>setPage(p=>p-1)}>Prev</button>
+        <span>Page {page+1} / {Math.max(1, Math.ceil(total/20))}</span>
+        <button disabled={(page+1) >= Math.ceil(total/20)} onClick={()=>setPage(p=>p+1)}>Next</button>
+      </div>
     </div>
-    <form className="card" onSubmit={onCreate}>
+    {editing && <form className="card" onSubmit={e=>{ e.preventDefault(); svc.update(editing.id, {
+      firstName: editing.firstName,
+      lastName: editing.lastName,
+      email: editing.email,
+      phone: editing.phone,
+      departmentId: (document.getElementById('edit-emp-dept-id') as HTMLInputElement)?.value || undefined,
+    }).then(()=>{ setEditing(null); load() }) }}>
+      <h3>Edit Employee</h3>
+      <div><label>First Name</label><input value={editing.firstName} onChange={e=>setEditing({...editing!, firstName:e.target.value})} required/></div>
+      <div><label>Last Name</label><input value={editing.lastName} onChange={e=>setEditing({...editing!, lastName:e.target.value})} required/></div>
+      <div><label>Email</label><input type="email" value={editing.email} onChange={e=>setEditing({...editing!, email:e.target.value})} required/></div>
+      <div><label>Phone</label><input value={editing.phone||''} onChange={e=>setEditing({...editing!, phone:e.target.value})} /></div>
+      <div><label>Department ID</label><input id="edit-emp-dept-id" placeholder="UUID" defaultValue={editing.departmentId||''} /></div>
+      <div className="row" style={{gap:8}}>
+        <button>Save</button>
+        <button type="button" onClick={()=>setEditing(null)}>Cancel</button>
+      </div>
+    </form>}
+    <form id="create-employee" className="card" onSubmit={onCreate}>
       <h3>Create Employee</h3>
-      <div><label>Name</label><input value={form.name} onChange={e=>setForm({...form, name:e.target.value})} required/></div>
+      <div><label>First Name</label><input value={form.firstName} onChange={e=>setForm({...form, firstName:e.target.value})} required/></div>
+      <div><label>Last Name</label><input value={form.lastName} onChange={e=>setForm({...form, lastName:e.target.value})} required/></div>
       <div><label>Email</label><input type="email" value={form.email} onChange={e=>setForm({...form, email:e.target.value})} required/></div>
-      <div><label>Department</label><input value={form.department||''} onChange={e=>setForm({...form, department:e.target.value})}/></div>
+      <div><label>Phone</label><input value={form.phone||''} onChange={e=>setForm({...form, phone:e.target.value})}/></div>
+      <div><label>Department ID</label><input placeholder="UUID" value={(form.departmentId as string)||''} onChange={e=>setForm({...form, departmentId: e.target.value})}/></div>
       <button>Create</button>
+    </form>
+    <form className="card" onSubmit={e=>{ e.preventDefault(); svc.findByEmail(searchEmail).then(setSearchResult).catch(()=>setSearchResult(null)) }}>
+      <h3>Find by Email</h3>
+      <div><label>Email</label><input type="email" value={searchEmail} onChange={e=>setSearchEmail(e.target.value)} /></div>
+      <button>Search</button>
+      {searchResult && <p className="small">Result: {searchResult.firstName} {searchResult.lastName} ({searchResult.email})</p>}
     </form>
   </div>
 }
