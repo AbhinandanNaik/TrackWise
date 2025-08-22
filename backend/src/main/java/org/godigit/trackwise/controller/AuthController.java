@@ -1,7 +1,12 @@
 package org.godigit.trackwise.controller;
 
+
 import org.godigit.trackwise.dto.AuthRequest;
 import org.godigit.trackwise.dto.AuthResponse;
+import org.godigit.trackwise.dto.SignupRequest;
+import org.godigit.trackwise.model.Department;
+import org.godigit.trackwise.model.Employee;
+import org.godigit.trackwise.model.User;
 import org.godigit.trackwise.service.CustomUserDetailsService;
 import org.godigit.trackwise.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +34,8 @@ public class AuthController {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
+
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request) {
         try {
@@ -47,4 +54,39 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(jwt));
 
     }
+
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
+        boolean approved = !request.getRole().equalsIgnoreCase("ADMIN");
+
+        // Create User
+        User user = new User(request.getUsername(),
+                passwordEncoder.encode(request.getPassword()),
+                request.getRole());
+        user.setApproved(approved);
+        userRepository.save(user);
+
+        // Create Employee
+        Department department = DepartmentRepository.findById(request.getDepartmentId())
+                .orElseThrow(() -> new RuntimeException("Department not found"));
+
+        Employee employee = new Employee();
+        employee.setFirstName(request.getFirstName());
+        employee.setLastName(request.getLastName());
+        employee.setEmail(request.getEmail());
+        employee.setPhone(request.getPhone());
+        employee.setDepartment(department);
+        employee.setCreatedBy(user.getUsername()); // if using BaseEntity
+        employeeRepository.save(employee);
+
+        if (!approved) {
+            return ResponseEntity.ok("Admin registration submitted. Awaiting approval.");
+        }
+
+        return ResponseEntity.ok("User registered successfully.");
+    }
+
+
+
+
 }

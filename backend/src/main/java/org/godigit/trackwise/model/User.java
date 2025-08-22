@@ -24,6 +24,9 @@ public class User {
 
     private String role; // e.g., "ROLE_ADMIN", "ROLE_USER"
 
+    private boolean approved = false; // default false for admins
+
+
     // Constructors
     public User() {}
 

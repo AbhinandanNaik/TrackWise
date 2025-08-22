@@ -9,4 +9,6 @@ import java.util.UUID;
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department, UUID> {
     // You can add custom queries if needed, for now basic CRUD is enough
+
+
 }
