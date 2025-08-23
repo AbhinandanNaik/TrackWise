@@ -4,6 +4,7 @@ import org.godigit.trackwise.dto.AssetScanRequest;
 import org.godigit.trackwise.dto.CheckInOutRequest; // Use DTOs
 import org.godigit.trackwise.dto.CheckInOutResponse;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,4 +22,8 @@ public interface CheckInOutService {
 
   // Add the new method for the smart scan
   CheckInOutResponse processAssetScan(AssetScanRequest request);
+
+  CheckInOutResponse findCurrentCheckoutByEmployee(UUID employeeId);
+
+  List<CheckInOutResponse> findOverdueAssets(LocalDate since);
 }

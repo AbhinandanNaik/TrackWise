@@ -16,10 +16,6 @@ public interface AssetService {
   Page<AssetResponse> list(Pageable pageable);
   AssetResponse update(UUID id, AssetRequest request);
   void delete(UUID id);
-
-  AssetResponse assignToEmployee(UUID assetId, UUID employeeId);
-  AssetResponse unassign(UUID assetId);
-
   List<AssetResponse> findByStatus(AssetStatus status);
-  List<AssetResponse> findWithWarrantyExpiringBetween(LocalDate from, LocalDate to);
+  Page<AssetResponse> findByName(String name, Pageable pageable);
 }

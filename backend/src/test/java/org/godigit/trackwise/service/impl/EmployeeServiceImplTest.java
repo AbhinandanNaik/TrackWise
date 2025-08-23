@@ -1,6 +1,7 @@
 package org.godigit.trackwise.service.impl;
 
 import org.godigit.trackwise.dto.EmployeeRequest;
+import org.godigit.trackwise.dto.EmployeeResponse;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.model.Department;
 import org.godigit.trackwise.model.Employee;
@@ -74,13 +75,12 @@ class EmployeeServiceImplTest {
         when(employeeRepository.save(any(Employee.class))).thenReturn(employee);
 
         // Act
-        Employee result = employeeService.create(employeeRequest);
+        EmployeeResponse result = employeeService.create(employeeRequest);
 
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getFirstName()).isEqualTo("John");
         assertThat(result.getLastName()).isEqualTo("Doe");
-        assertThat(result.getDepartment()).isEqualTo(department);
 
         verify(departmentRepository).findById(departmentId);
         verify(employeeRepository).save(any(Employee.class));
@@ -106,7 +106,7 @@ class EmployeeServiceImplTest {
         when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
 
         // Act
-        Employee result = employeeService.getById(employeeId);
+        EmployeeResponse result = employeeService.getById(employeeId);
 
         // Assert
         assertThat(result).isNotNull();
@@ -136,7 +136,7 @@ class EmployeeServiceImplTest {
         when(employeeRepository.findAll(pageable)).thenReturn(page);
 
         // Act
-        Page<Employee> result = employeeService.list(pageable);
+        Page<EmployeeResponse> result = employeeService.list(pageable);
 
         // Assert
         assertThat(result).isNotNull();
@@ -167,7 +167,7 @@ class EmployeeServiceImplTest {
         when(employeeRepository.save(any(Employee.class))).thenReturn(updatedEmployee);
 
         // Act
-        Employee result = employeeService.update(employeeId, updateDTO);
+        EmployeeResponse result = employeeService.update(employeeId, updateDTO);
 
         // Assert
         assertThat(result).isNotNull();
@@ -200,7 +200,7 @@ class EmployeeServiceImplTest {
         when(employeeRepository.findByEmail(email)).thenReturn(Optional.of(employee));
 
         // Act
-        Optional<Employee> result = employeeService.findByEmail(email);
+        Optional<EmployeeResponse> result = employeeService.findByEmail(email);
 
         // Assert
         assertThat(result).isPresent();

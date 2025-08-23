@@ -24,7 +24,7 @@ public class NewsServiceImpl implements NewsService {
 
     public List<ArticleRequest> fetchNewsForKeyword(String keyword) {
         // Example URL for NewsAPI.org
-        String url = "https://newsapi.org/v2/everything?q=" + keyword + "&apiKey=3&apiKey=  " + apiKey;
+        String url = "https://newsapi.org/v2/everything?q=" + keyword + "&apiKey=3&apiKey=" + apiKey;
 
         try {
             NewsApiResponse response = restTemplate.getForObject(url, NewsApiResponse.class);
