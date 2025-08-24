@@ -6,5 +6,5 @@ import java.util.List;
 
 @Data
 public class NewsApiResponse {
-    private List<ArticleDTO> articles;
+    private List<ArticleRequest> articles;
 }

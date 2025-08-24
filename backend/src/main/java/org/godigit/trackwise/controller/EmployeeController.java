@@ -1,10 +1,11 @@
 package org.godigit.trackwise.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.godigit.trackwise.dto.EmployeeRequestDTO;
-import org.godigit.trackwise.dto.EmployeeResponseDTO;
-import org.godigit.trackwise.mapper.EmployeeMapper;
-import org.godigit.trackwise.model.Employee;
+import org.godigit.trackwise.dto.EmployeeRequest;
+import org.godigit.trackwise.dto.EmployeeResponse;
 import org.godigit.trackwise.service.EmployeeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,59 +13,152 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * REST controller for managing all employee-related operations.
+ * This includes creating, retrieving, updating, and deleting employee profiles.
+ */
 @RestController
 @RequestMapping("/api/employees")
 @RequiredArgsConstructor
+@Tag(name = "3. Employee Management", description = "Endpoints for managing employees.")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    // ✅ Create
+    /**
+     * Creates a new employee.
+     * Accessible only by ADMIN role.
+     * @param requestDTO The DTO containing the new employee's data.
+     * @return The created employee's data as a DTO.
+     */
     @PostMapping
-    public ResponseEntity<EmployeeResponseDTO> createEmployee(@RequestBody EmployeeRequestDTO requestDTO) {
-        Employee created = employeeService.create(requestDTO);
-        return new ResponseEntity<>(EmployeeMapper.toDto(created), HttpStatus.CREATED);
+    @Operation(summary = "Create a new employee")
+    public ResponseEntity<EmployeeResponse> createEmployee(@Valid @RequestBody EmployeeRequest requestDTO) {
+        // The service now directly returns the response DTO.
+        EmployeeResponse createdDto = employeeService.create(requestDTO);
+        return new ResponseEntity<>(createdDto, HttpStatus.CREATED);
     }
 
-    // ✅ Get by ID
+    /**
+     * Retrieves a single employee by their unique ID.
+     * Accessible by USER and ADMIN roles.
+     * @param id The UUID of the employee.
+     * @return The employee's data as a DTO.
+     */
     @GetMapping("/{id}")
-    public ResponseEntity<EmployeeResponseDTO> getEmployee(@PathVariable UUID id) {
-        Employee employee = employeeService.getById(id);
-        return ResponseEntity.ok(EmployeeMapper.toDto(employee));
+    @Operation(summary = "Get an employee by ID")
+    public ResponseEntity<EmployeeResponse> getEmployee(@PathVariable UUID id) {
+        // The service handles the lookup and mapping.
+        return ResponseEntity.ok(employeeService.getById(id));
     }
 
-    // ✅ List with pagination
+    /**
+     * Retrieves a paginated list of all employees.
+     * Accessible by USER and ADMIN roles.
+     * @param pageable Pagination information.
+     * @return A paginated list of employee DTOs.
+     */
     @GetMapping
-    public ResponseEntity<Page<EmployeeResponseDTO>> listEmployees(Pageable pageable) {
-        Page<EmployeeResponseDTO> employees = employeeService.list(pageable)
-                .map(EmployeeMapper::toDto);
-        return ResponseEntity.ok(employees);
+    @Operation(summary = "List all employees with pagination")
+    public ResponseEntity<Page<EmployeeResponse>> listEmployees(Pageable pageable) {
+        // The service returns a Page of DTOs, no mapping needed here.
+        return ResponseEntity.ok(employeeService.list(pageable));
     }
 
-    // ✅ Update
+    /**
+     * Updates an existing employee's profile.
+     * Accessible only by ADMIN role.
+     * @param id The UUID of the employee to update.
+     * @param requestDTO The DTO with the new data.
+     * @return The updated employee's data as a DTO.
+     */
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable UUID id,
-                                                              @RequestBody EmployeeRequestDTO requestDTO) {
-        Employee updated = employeeService.update(id, requestDTO);
-        return ResponseEntity.ok(EmployeeMapper.toDto(updated));
+    @Operation(summary = "Update an existing employee")
+    public ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable UUID id,
+                                                           @Valid @RequestBody EmployeeRequest requestDTO) {
+        return ResponseEntity.ok(employeeService.update(id, requestDTO));
     }
 
-    // ✅ Delete
+    /**
+     * Deletes an employee from the system.
+     * Accessible only by ADMIN role.
+     * @param id The UUID of the employee to delete.
+     * @return A no-content response.
+     */
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete an employee")
     public ResponseEntity<Void> deleteEmployee(@PathVariable UUID id) {
         employeeService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    // ✅ Find by email
+    /**
+     * Finds a single employee by their email address.
+     * Accessible by USER and ADMIN roles.
+     * @param email The email to search for.
+     * @return The found employee's data, or 404 Not Found.
+     */
     @GetMapping("/search")
-    public ResponseEntity<EmployeeResponseDTO> findByEmail(@RequestParam String email) {
-        Optional<Employee> employeeOpt = employeeService.findByEmail(email);
-        return employeeOpt
-                .map(employee -> ResponseEntity.ok(EmployeeMapper.toDto(employee)))
-                .orElse(ResponseEntity.notFound().build());
+    @Operation(summary = "Find an employee by email")
+    public ResponseEntity<EmployeeResponse> findByEmail(@RequestParam String email) {
+        return employeeService.findByEmail(email)
+                .map(ResponseEntity::ok) // If found, wrap in ResponseEntity.ok()
+                .orElse(ResponseEntity.notFound().build()); // If not found, return 404.
     }
+
+    /**
+     * Finds all employees belonging to a specific department, with pagination.
+     * Accessible by USER and ADMIN roles.
+     *
+     * @param departmentId The UUID of the department to filter by.
+     * @param pageable Pagination information (page, size, sort).
+     * @return A paginated list of employees in the specified department.
+     */
+    @GetMapping("/by-department/{departmentId}")
+    @Operation(summary = "Find all employees in a department")
+    public ResponseEntity<Page<EmployeeResponse>> findByDepartment(
+            @PathVariable UUID departmentId,
+            Pageable pageable) {
+        // The service call is straightforward and returns the paginated DTO list.
+        return ResponseEntity.ok(employeeService.findByDepartment(departmentId, pageable));
+    }
+
+    /**
+     * Finds employees whose first or last name contains the given search term.
+     * This search is case-insensitive and supports pagination.
+     * Accessible by USER and ADMIN roles.
+     *
+     * @param name The search term for the employee's name.
+     * @param pageable Pagination information.
+     * @return A paginated list of employees matching the name.
+     */
+    @GetMapping("/search/by-name")
+    @Operation(summary = "Find employees by name")
+    public ResponseEntity<Page<EmployeeResponse>> findByName(
+            @RequestParam String name,
+            Pageable pageable) {
+        return ResponseEntity.ok(employeeService.findByName(name, pageable));
+    }
+
+    /**
+     * Assigns an employee to a specific department.
+     * This is an administrative action.
+     * Accessible only by ADMIN role.
+     * @param employeeId The UUID of the employee to assign.
+     * @param departmentId The UUID of the new department.
+     * @return The updated employee's data as a DTO.
+     */
+    @PutMapping("/{employeeId}/assign-department")
+    @Operation(summary = "Assign an employee to a department")
+    public ResponseEntity<EmployeeResponse> assignDepartment(
+            @PathVariable UUID employeeId,
+            @RequestParam UUID departmentId) {
+        // Delegate the business logic to the EmployeeService.
+        EmployeeResponse updatedEmployee = employeeService.assignDepartment(employeeId, departmentId);
+        return ResponseEntity.ok(updatedEmployee);
+    }
+
+
 }

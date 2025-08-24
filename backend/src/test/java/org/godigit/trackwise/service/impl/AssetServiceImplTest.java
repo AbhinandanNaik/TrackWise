@@ -5,6 +5,7 @@ import org.godigit.trackwise.dto.AssetResponse;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.mapper.AssetMapper;
 import org.godigit.trackwise.model.*;
+import org.godigit.trackwise.model.Enum.AssetStatus;
 import org.godigit.trackwise.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

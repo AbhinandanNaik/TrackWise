@@ -1,10 +1,10 @@
 package org.godigit.trackwise.service.impl;
 
-import org.godigit.trackwise.dto.MaintenanceRequestDTO;
-import org.godigit.trackwise.dto.MaintenanceResponseDTO;
+import org.godigit.trackwise.dto.MaintenanceRequest;
+import org.godigit.trackwise.dto.MaintenanceResponse;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.model.Asset;
-import org.godigit.trackwise.model.AssetStatus;
+import org.godigit.trackwise.model.Enum.AssetStatus;
 import org.godigit.trackwise.model.MaintenanceLog;
 import org.godigit.trackwise.repository.AssetRepository;
 import org.godigit.trackwise.repository.MaintenanceLogRepository;
@@ -41,7 +41,7 @@ public class MaintenanceServiceImplTest {
 
     private Asset testAsset;
     private MaintenanceLog testMaintenanceLog;
-    private MaintenanceRequestDTO testRequestDTO;
+    private MaintenanceRequest testRequestDTO;
     private UUID assetId;
 
     @BeforeEach
@@ -63,7 +63,7 @@ public class MaintenanceServiceImplTest {
         testMaintenanceLog.setPerformedBy("John Technician");
         
         // Setup test request DTO
-        testRequestDTO = new MaintenanceRequestDTO();
+        testRequestDTO = new MaintenanceRequest();
         testRequestDTO.setDescription("Regular maintenance");
         testRequestDTO.setMaintenanceDate(LocalDate.now());
         testRequestDTO.setPerformedBy("John Technician");
@@ -76,7 +76,7 @@ public class MaintenanceServiceImplTest {
         when(maintenanceLogRepository.save(any(MaintenanceLog.class))).thenReturn(testMaintenanceLog);
         
         // Act
-        MaintenanceResponseDTO response = maintenanceService.addMaintenance(assetId, testRequestDTO);
+        MaintenanceResponse response = maintenanceService.addMaintenance(assetId, testRequestDTO);
         
         // Assert
         assertThat(response).isNotNull();
@@ -133,7 +133,7 @@ public class MaintenanceServiceImplTest {
         when(maintenanceLogRepository.findByAssetId(assetId)).thenReturn(logs);
         
         // Act
-        List<MaintenanceResponseDTO> responses = maintenanceService.listByAsset(assetId);
+        List<MaintenanceResponse> responses = maintenanceService.listByAsset(assetId);
         
         // Assert
         assertThat(responses).isNotNull();
@@ -153,7 +153,7 @@ public class MaintenanceServiceImplTest {
         when(maintenanceLogRepository.findByAssetId(assetId)).thenReturn(List.of());
         
         // Act
-        List<MaintenanceResponseDTO> responses = maintenanceService.listByAsset(assetId);
+        List<MaintenanceResponse> responses = maintenanceService.listByAsset(assetId);
         
         // Assert
         assertThat(responses).isNotNull();

@@ -1,14 +1,14 @@
 package org.godigit.trackwise.mapper;
 
-import org.godigit.trackwise.dto.EmployeeRequestDTO;
-import org.godigit.trackwise.dto.EmployeeResponseDTO;
+import org.godigit.trackwise.dto.EmployeeRequest;
+import org.godigit.trackwise.dto.EmployeeResponse;
 import org.godigit.trackwise.model.Department;
 import org.godigit.trackwise.model.Employee;
 
 public class EmployeeMapper {
 
     // Map from Request DTO + Department entity → Employee
-    public static Employee toEntity(EmployeeRequestDTO dto, Department department) {
+    public static Employee toEntity(EmployeeRequest dto, Department department) {
         Employee employee = new Employee();
         employee.setFirstName(dto.getFirstName());
         employee.setLastName(dto.getLastName());
@@ -19,8 +19,8 @@ public class EmployeeMapper {
     }
 
     // Map Employee → Response DTO
-    public static EmployeeResponseDTO toDto(Employee employee) {
-        EmployeeResponseDTO dto = new EmployeeResponseDTO();
+    public static EmployeeResponse toDto(Employee employee) {
+        EmployeeResponse dto = new EmployeeResponse();
         dto.setId(employee.getId());
         dto.setFirstName(employee.getFirstName());
         dto.setLastName(employee.getLastName());

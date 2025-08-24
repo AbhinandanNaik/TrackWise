@@ -1,9 +1,11 @@
 package org.godigit.trackwise.service.impl;
 
-import org.godigit.trackwise.dto.AssetScanRequestDTO;
-import org.godigit.trackwise.dto.CheckInOutRequestDTO;
-import org.godigit.trackwise.dto.CheckInOutResponseDTO;
+import org.godigit.trackwise.dto.AssetScanRequest;
+import org.godigit.trackwise.dto.CheckInOutRequest;
+import org.godigit.trackwise.dto.CheckInOutResponse;
 import org.godigit.trackwise.model.*;
+import org.godigit.trackwise.model.Enum.AssetStatus;
+import org.godigit.trackwise.model.Enum.CheckInOutAction;
 import org.godigit.trackwise.repository.AssetRepository;
 import org.godigit.trackwise.repository.CheckInOutLogRepository;
 import org.godigit.trackwise.repository.EmployeeRepository;
@@ -63,7 +65,7 @@ class CheckInOutServiceImplTest {
 
     @Test
     void shouldCheckoutAsset() {
-        CheckInOutRequestDTO request = new CheckInOutRequestDTO();
+        CheckInOutRequest request = new CheckInOutRequest();
         request.setAssetId(assetId);
         request.setEmployeeId(employeeId);
 
@@ -71,7 +73,7 @@ class CheckInOutServiceImplTest {
         when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
         when(checkInOutLogRepository.save(any())).thenReturn(log);
 
-        CheckInOutResponseDTO response = checkInOutService.checkoutAsset(request);
+        CheckInOutResponse response = checkInOutService.checkoutAsset(request);
 
         assertThat(response).isNotNull();
         assertThat(response.getAssetId()).isEqualTo(assetId);
@@ -86,7 +88,7 @@ class CheckInOutServiceImplTest {
         asset.setAssignedTo(employee);
         log.setCheckInTime(null);
 
-        CheckInOutRequestDTO request = new CheckInOutRequestDTO();
+        CheckInOutRequest request = new CheckInOutRequest();
         request.setAssetId(assetId);
         request.setEmployeeId(employeeId);
 
@@ -94,7 +96,7 @@ class CheckInOutServiceImplTest {
                 .thenReturn(Optional.of(log));
         when(checkInOutLogRepository.save(any())).thenReturn(log);
 
-        CheckInOutResponseDTO response = checkInOutService.checkinAsset(request);
+        CheckInOutResponse response = checkInOutService.checkinAsset(request);
 
         assertThat(response).isNotNull();
         assertThat(response.getAssetId()).isEqualTo(assetId);
@@ -107,7 +109,7 @@ class CheckInOutServiceImplTest {
     void shouldProcessAssetScan_Checkout() {
         asset.setStatus(AssetStatus.AVAILABLE);
 
-        AssetScanRequestDTO request = new AssetScanRequestDTO();
+        AssetScanRequest request = new AssetScanRequest();
         request.setAssetId(assetId);
         request.setEmployeeId(employeeId);
 
@@ -115,7 +117,7 @@ class CheckInOutServiceImplTest {
         when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
         when(checkInOutLogRepository.save(any())).thenReturn(log);
 
-        CheckInOutResponseDTO response = checkInOutService.processAssetScan(request);
+        CheckInOutResponse response = checkInOutService.processAssetScan(request);
 
         assertThat(response).isNotNull();
         assertThat(response.getAssetId()).isEqualTo(assetId);
@@ -127,7 +129,7 @@ class CheckInOutServiceImplTest {
         asset.setAssignedTo(employee);
         log.setCheckInTime(null);
 
-        AssetScanRequestDTO request = new AssetScanRequestDTO();
+        AssetScanRequest request = new AssetScanRequest();
         request.setAssetId(assetId);
         request.setEmployeeId(employeeId);
 
@@ -136,7 +138,7 @@ class CheckInOutServiceImplTest {
                 .thenReturn(Optional.of(log));
         when(checkInOutLogRepository.save(any())).thenReturn(log);
 
-        CheckInOutResponseDTO response = checkInOutService.processAssetScan(request);
+        CheckInOutResponse response = checkInOutService.processAssetScan(request);
 
         assertThat(response).isNotNull();
         assertThat(response.getAssetId()).isEqualTo(assetId);
@@ -146,7 +148,7 @@ class CheckInOutServiceImplTest {
     void shouldReturnHistoryByAsset() {
         when(checkInOutLogRepository.findByAssetId(assetId)).thenReturn(List.of(log));
 
-        List<CheckInOutResponseDTO> history = checkInOutService.historyByAsset(assetId);
+        List<CheckInOutResponse> history = checkInOutService.historyByAsset(assetId);
 
         assertThat(history).hasSize(1);
         assertThat(history.get(0).getAssetId()).isEqualTo(assetId);
@@ -156,7 +158,7 @@ class CheckInOutServiceImplTest {
     void shouldReturnHistoryByEmployee() {
         when(checkInOutLogRepository.findByEmployeeId(employeeId)).thenReturn(List.of(log));
 
-        List<CheckInOutResponseDTO> history = checkInOutService.historyByEmployee(employeeId);
+        List<CheckInOutResponse> history = checkInOutService.historyByEmployee(employeeId);
 
         assertThat(history).hasSize(1);
         assertThat(history.get(0).getEmployeeId()).isEqualTo(employeeId);
@@ -166,7 +168,7 @@ class CheckInOutServiceImplTest {
     void shouldThrowIfAssetNotAvailableForCheckout() {
         asset.setStatus(AssetStatus.ASSIGNED);
 
-        CheckInOutRequestDTO request = new CheckInOutRequestDTO();
+        CheckInOutRequest request = new CheckInOutRequest();
         request.setAssetId(assetId);
         request.setEmployeeId(employeeId);
 

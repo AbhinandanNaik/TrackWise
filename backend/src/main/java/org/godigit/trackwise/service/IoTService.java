@@ -1,15 +1,15 @@
 package org.godigit.trackwise.service;
 
-import org.godigit.trackwise.dto.IoTDataRequestDTO;
-import org.godigit.trackwise.dto.IoTDataResponseDTO;
+import org.godigit.trackwise.dto.IoTDataRequest;
+import org.godigit.trackwise.dto.IoTDataResponse;
 
 import java.util.UUID;
 
 public interface IoTService {
-  IoTDataResponseDTO ingest(IoTDataRequestDTO request);
+  IoTDataResponse ingest(IoTDataRequest request);
 
   // Add latitude and longitude to the method signature
-  IoTDataResponseDTO processSensorData(UUID assetId, Double temperature, Double batteryLevel, Boolean inUse, Double latitude, Double longitude);
+  IoTDataResponse processSensorData(UUID assetId, Double temperature, Double batteryLevel, Boolean inUse, Double latitude, Double longitude);
 
   void startSimulator();
   void stopSimulator();

@@ -4,7 +4,7 @@ import org.godigit.trackwise.dto.AssetRequest;
 import org.godigit.trackwise.dto.AssetResponse;
 import org.godigit.trackwise.model.Asset;
 import org.godigit.trackwise.model.AssetCategory;
-import org.godigit.trackwise.model.AssetStatus;
+import org.godigit.trackwise.model.Enum.AssetStatus;
 import org.godigit.trackwise.model.Employee;
 import org.springframework.stereotype.Component;
 

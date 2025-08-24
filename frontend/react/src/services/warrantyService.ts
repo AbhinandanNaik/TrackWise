@@ -1,3 +1,31 @@
 import { request } from './api'
-export type Alert = { assetId:number, assetName:string, warrantyExpiry:string, daysLeft:number }
-export async function alerts(): Promise<Alert[]>{ return request('/api/warranty/alerts') }
+
+export type UUID = string
+
+export type WarrantyRequestDTO = {
+  assetId: UUID
+  startDate: string
+  endDate: string
+  vendor?: string
+}
+
+export type WarrantyResponseDTO = {
+  warrantyId: UUID
+  assetId: UUID
+  assetName: string
+  startDate: string
+  endDate: string
+  vendor?: string
+}
+
+export async function createOrUpdate(payload: WarrantyRequestDTO): Promise<WarrantyResponseDTO> {
+  return request('/api/warranties', { method: 'POST', body: JSON.stringify(payload) })
+}
+
+export async function findExpiringBetween(from: string, to: string): Promise<WarrantyResponseDTO[]> {
+  return request(`/api/warranties/search?from=${from}&to=${to}`)
+}
+
+export async function extendWarranty(id: UUID, newEndDate: string): Promise<WarrantyResponseDTO> {
+  return request(`/api/warranties/${id}/extend?newEndDate=${newEndDate}`, { method: 'PUT' })
+}

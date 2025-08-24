@@ -1,8 +1,8 @@
 package org.godigit.trackwise.service.impl;
 
-import org.godigit.trackwise.dto.EmailRequestDTO;
-import org.godigit.trackwise.dto.NotificationRequestDTO;
-import org.godigit.trackwise.dto.NotificationResponseDTO;
+import org.godigit.trackwise.dto.EmailRequest;
+import org.godigit.trackwise.dto.NotificationRequest;
+import org.godigit.trackwise.dto.NotificationResponse;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.model.Employee;
 import org.godigit.trackwise.model.Notification;
@@ -44,8 +44,8 @@ public class NotificationServiceImplTest {
 
     private Employee testEmployee;
     private Notification testNotification;
-    private NotificationRequestDTO testNotificationRequestDTO;
-    private EmailRequestDTO testEmailRequestDTO;
+    private NotificationRequest testNotificationRequest;
+    private EmailRequest testEmailRequest;
     private UUID employeeId;
 
     @BeforeEach
@@ -69,15 +69,15 @@ public class NotificationServiceImplTest {
                 .build();
         
         // Setup test notification request DTO
-        testNotificationRequestDTO = new NotificationRequestDTO();
-        testNotificationRequestDTO.setRecipientId(employeeId);
-        testNotificationRequestDTO.setMessage("Test notification message");
+        testNotificationRequest = new NotificationRequest();
+        testNotificationRequest.setRecipientId(employeeId);
+        testNotificationRequest.setMessage("Test notification message");
         
         // Setup test email request DTO
-        testEmailRequestDTO = new EmailRequestDTO();
-        testEmailRequestDTO.setTo("john.doe@example.com");
-        testEmailRequestDTO.setSubject("Test Email Subject");
-        testEmailRequestDTO.setBody("Test email body content");
+        testEmailRequest = new EmailRequest();
+        testEmailRequest.setTo("john.doe@example.com");
+        testEmailRequest.setSubject("Test Email Subject");
+        testEmailRequest.setBody("Test email body content");
     }
 
     @Test
@@ -87,7 +87,7 @@ public class NotificationServiceImplTest {
         when(notificationRepository.save(any(Notification.class))).thenReturn(testNotification);
         
         // Act
-        NotificationResponseDTO response = notificationService.createInAppNotification(testNotificationRequestDTO);
+        NotificationResponse response = notificationService.createInAppNotification(testNotificationRequest);
         
         // Assert
         assertThat(response).isNotNull();
@@ -110,7 +110,7 @@ public class NotificationServiceImplTest {
         
         // Act & Assert
         assertThrows(NotFoundException.class, () -> 
-                notificationService.createInAppNotification(testNotificationRequestDTO));
+                notificationService.createInAppNotification(testNotificationRequest));
         
         // Verify interactions
         verify(employeeRepository).findById(employeeId);
@@ -123,7 +123,7 @@ public class NotificationServiceImplTest {
         doNothing().when(mailSender).send(any(SimpleMailMessage.class));
         
         // Act
-        notificationService.sendEmail(testEmailRequestDTO);
+        notificationService.sendEmail(testEmailRequest);
         
         // Assert - Capture the SimpleMailMessage to verify its properties
         ArgumentCaptor<SimpleMailMessage> messageCaptor = ArgumentCaptor.forClass(SimpleMailMessage.class);

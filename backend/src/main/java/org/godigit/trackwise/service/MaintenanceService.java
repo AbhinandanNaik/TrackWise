@@ -1,12 +1,12 @@
 package org.godigit.trackwise.service;
 
-import org.godigit.trackwise.dto.MaintenanceRequestDTO;
-import org.godigit.trackwise.dto.MaintenanceResponseDTO;
+import org.godigit.trackwise.dto.MaintenanceRequest;
+import org.godigit.trackwise.dto.MaintenanceResponse;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface MaintenanceService {
-  MaintenanceResponseDTO addMaintenance(UUID assetId, MaintenanceRequestDTO request);
-  List<MaintenanceResponseDTO> listByAsset(UUID assetId);
+  MaintenanceResponse addMaintenance(UUID assetId, MaintenanceRequest request);
+  List<MaintenanceResponse> listByAsset(UUID assetId);
 }
