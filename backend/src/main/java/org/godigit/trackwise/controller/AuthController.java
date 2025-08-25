@@ -31,7 +31,6 @@ public class AuthController {
     private final AuthService authService;
     private final org.godigit.trackwise.repository.UserRepository userRepository;
 
-    private final UserRepository userRepository;
 
     /**
      * Authenticates a user and returns a JWT token upon successful login.
