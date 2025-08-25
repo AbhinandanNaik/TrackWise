@@ -8,10 +8,12 @@ import org.godigit.trackwise.dto.AuthRequest;
 import org.godigit.trackwise.dto.AuthResponse;
 import org.godigit.trackwise.dto.RegistrationRequest;
 import org.godigit.trackwise.dto.UserResponse;
+import org.godigit.trackwise.repository.UserRepository;
 import org.godigit.trackwise.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -26,6 +28,8 @@ public class AuthController {
 
     // The service layer that contains all the business logic for authentication.
     private final AuthService authService;
+
+    private final UserRepository userRepository;
 
     /**
      * Authenticates a user and returns a JWT token upon successful login.
@@ -62,5 +66,20 @@ public class AuthController {
             // If the username or email already exists, return a 400 Bad Request.
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    /**
+     * Returns the currently authenticated user's profile (including linked employeeId if any).
+     */
+    @GetMapping("/me")
+    @Operation(summary = "Get current authenticated user profile")
+    public ResponseEntity<?> me(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+        String username = authentication.getName();
+        var user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new org.godigit.trackwise.exception.NotFoundException("User not found"));
+        return ResponseEntity.ok(org.godigit.trackwise.mapper.UserMapper.toResponseDTO(user));
     }
 }
