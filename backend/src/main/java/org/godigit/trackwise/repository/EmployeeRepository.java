@@ -12,6 +12,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
 
   Optional<Employee> findByEmail(String email);
 
+  boolean existsByEmail(String email);
+
   // Finds all employees for a given department, with pagination
   Page<Employee> findByDepartmentId(UUID departmentId, Pageable pageable);
 

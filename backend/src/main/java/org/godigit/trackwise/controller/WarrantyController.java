@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.godigit.trackwise.dto.WarrantyRequest;
 import org.godigit.trackwise.dto.WarrantyResponse;
+import org.godigit.trackwise.exception.BadRequestException;
 import org.godigit.trackwise.service.WarrantyService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -55,6 +56,9 @@ public class WarrantyController {
     public ResponseEntity<List<WarrantyResponse>> findExpiringBetween(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        if (from == null || to == null) {
+            throw new BadRequestException("Both 'from' and 'to' date parameters are required for this search.");
+        }
         // Delegate the search logic to the service layer.
         List<WarrantyResponse> list = warrantyService.findExpiringBetween(from, to);
         // Return a 200 OK response with the list of found warranties.

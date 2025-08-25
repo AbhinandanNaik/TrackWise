@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.godigit.trackwise.dto.AssetScanRequest;
 import org.godigit.trackwise.dto.CheckInOutRequest;
 import org.godigit.trackwise.dto.CheckInOutResponse;
+import org.godigit.trackwise.exception.InvalidStateException;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.mapper.CheckInOutMapper;
 import org.godigit.trackwise.model.*;
@@ -54,7 +55,7 @@ public class CheckInOutServiceImpl implements CheckInOutService {
 
         // Business Rule: Ensure the asset is actually available before checking it out.
         if (asset.getStatus() != AssetStatus.AVAILABLE) {
-            throw new IllegalStateException("Asset is not available for checkout. Current status: " + asset.getStatus());
+            throw new InvalidStateException("Asset is not available for checkout. Current status: " + asset.getStatus());
         }
 
         // Create a new log entry for this transaction.

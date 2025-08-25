@@ -3,6 +3,7 @@ package org.godigit.trackwise.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.godigit.trackwise.dto.EmployeeRequest;
 import org.godigit.trackwise.dto.EmployeeResponse;
+import org.godigit.trackwise.exception.DuplicateResourceException;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.mapper.EmployeeMapper;
 import org.godigit.trackwise.model.Department;
@@ -38,6 +39,9 @@ public class EmployeeServiceImpl implements EmployeeService {
    */
   @Override
   public EmployeeResponse create(EmployeeRequest dto) {
+    if (employeeRepository.existsByEmail(dto.getEmail())) {
+      throw new DuplicateResourceException("An employee with the email '" + dto.getEmail() + "' already exists.");
+    }
     // Find the department to link to the employee.
     Department dept = findDepartmentById(dto.getDepartmentId());
 

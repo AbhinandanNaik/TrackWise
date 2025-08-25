@@ -3,6 +3,7 @@ package org.godigit.trackwise.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.godigit.trackwise.dto.AssetRequest;
 import org.godigit.trackwise.dto.AssetResponse;
+import org.godigit.trackwise.exception.DuplicateResourceException;
 import org.godigit.trackwise.exception.NotFoundException;
 import org.godigit.trackwise.mapper.AssetMapper;
 import org.godigit.trackwise.model.*;
@@ -39,6 +40,9 @@ public class AssetServiceImpl implements AssetService {
    */
   @Override
   public AssetResponse create(AssetRequest request) {
+    if (assetRepository.existsBySerialNumber(request.getSerialNumber())) {
+      throw new DuplicateResourceException("An asset with serial number '" + request.getSerialNumber() + "' already exists.");
+    }
     // Find the category for the asset, throwing an exception if not found.
     AssetCategory category = (request.getCategoryId() != null)
             ? categoryRepository.findById(request.getCategoryId())

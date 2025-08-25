@@ -8,6 +8,7 @@ import org.godigit.trackwise.dto.AuthRequest;
 import org.godigit.trackwise.dto.AuthResponse;
 import org.godigit.trackwise.dto.RegistrationRequest;
 import org.godigit.trackwise.dto.UserResponse;
+import org.godigit.trackwise.exception.AuthenticationException;
 import org.godigit.trackwise.repository.UserRepository;
 import org.godigit.trackwise.service.AuthService;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class AuthController {
             return ResponseEntity.ok(response);
         } catch (BadCredentialsException e) {
             // If authentication fails, return a 401 Unauthorized status.
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+            throw new AuthenticationException("Invalid username or password");
         }
     }
 

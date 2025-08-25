@@ -18,6 +18,8 @@ public interface AssetRepository extends JpaRepository<Asset, UUID> {
 
   List<Asset> findByCategoryName(String categoryName);
 
+  boolean existsBySerialNumber(String serialNumber);
+
   @Query("SELECT a FROM Asset a WHERE a.purchaseDate < CURRENT_DATE - 1 YEAR")
   List<Asset> findAssetsOlderThanOneYear();
 
