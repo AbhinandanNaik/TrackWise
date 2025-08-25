@@ -12,6 +12,7 @@ import org.godigit.trackwise.repository.UserRepository;
 import org.godigit.trackwise.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ public class AuthController {
 
     // The service layer that contains all the business logic for authentication.
     private final AuthService authService;
+    private final org.godigit.trackwise.repository.UserRepository userRepository;
 
     private final UserRepository userRepository;
 
