@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -182,15 +183,16 @@ class EmployeeServiceImplTest {
     @Test
     void shouldDeleteEmployee() {
         // Arrange
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        doNothing().when(employeeRepository).delete(employee);
+        // Service now uses existsById + deleteById
+        when(employeeRepository.existsById(employeeId)).thenReturn(true);
+        doNothing().when(employeeRepository).deleteById(employeeId);
 
-        // Act
-        employeeService.delete(employeeId);
+        // Act & Assert: ensure method does not throw
+        assertThatCode(() -> employeeService.delete(employeeId)).doesNotThrowAnyException();
 
-        // Assert
-        verify(employeeRepository).findById(employeeId);
-        verify(employeeRepository).delete(employee);
+        // Verify repository interaction
+        verify(employeeRepository).existsById(employeeId);
+        verify(employeeRepository).deleteById(employeeId);
     }
 
     @Test

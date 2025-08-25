@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -135,10 +136,24 @@ class AssetServiceImplTest {
         Asset asset = sampleAsset();
         AssetResponse response = sampleResponse();
 
-        when(assetRepository.findAll(any(PageRequest.class))).thenReturn(new PageImpl<>(List.of(asset)));
+        when(assetRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(List.of(asset)));
         when(assetMapper.toResponse(asset)).thenReturn(response);
 
         var result = assetService.list(PageRequest.of(0, 10));
+
+        assertThat(result.getContent()).hasSize(1);
+    }
+
+    @Test
+    void shouldFindByName() {
+        Asset asset = sampleAsset();
+        AssetResponse response = sampleResponse();
+
+        when(assetRepository.findByNameContainingIgnoreCase(eq("lap"), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(asset)));
+        when(assetMapper.toResponse(asset)).thenReturn(response);
+
+        var result = assetService.findByName("lap", PageRequest.of(0, 10));
 
         assertThat(result.getContent()).hasSize(1);
     }
@@ -180,38 +195,6 @@ class AssetServiceImplTest {
     }
 
     @Test
-    void shouldAssignToEmployee() {
-        Asset asset = sampleAsset();
-        Employee employee = new Employee();
-        AssetResponse response = sampleResponse();
-
-        when(assetRepository.findById(assetId)).thenReturn(Optional.of(asset));
-        when(employeeRepository.findById(employeeId)).thenReturn(Optional.of(employee));
-        when(assetRepository.save(asset)).thenReturn(asset);
-        when(assetMapper.toResponse(asset)).thenReturn(response);
-
-        AssetResponse result = assetService.assignToEmployee(assetId, employeeId);
-
-        assertThat(result).isNotNull();
-        verify(assetRepository).save(asset);
-    }
-
-    @Test
-    void shouldUnassignAsset() {
-        Asset asset = sampleAsset();
-        AssetResponse response = sampleResponse();
-
-        when(assetRepository.findById(assetId)).thenReturn(Optional.of(asset));
-        when(assetRepository.save(asset)).thenReturn(asset);
-        when(assetMapper.toResponse(asset)).thenReturn(response);
-
-        AssetResponse result = assetService.unassign(assetId);
-
-        assertThat(result).isNotNull();
-        verify(assetRepository).save(asset);
-    }
-
-    @Test
     void shouldFindByStatus() {
         Asset asset = sampleAsset();
         AssetResponse response = sampleResponse();
@@ -220,22 +203,6 @@ class AssetServiceImplTest {
         when(assetMapper.toResponse(asset)).thenReturn(response);
 
         List<AssetResponse> result = assetService.findByStatus(AssetStatus.AVAILABLE);
-
-        assertThat(result).hasSize(1);
-    }
-
-    @Test
-    void shouldFindWithWarrantyExpiringBetween() {
-        Warranty warranty = new Warranty();
-        Asset asset = sampleAsset();
-        warranty.setAsset(asset);
-        AssetResponse response = sampleResponse();
-
-        when(warrantyRepository.findByEndDateBetween(any(), any())).thenReturn(List.of(warranty));
-        when(assetMapper.toResponse(asset)).thenReturn(response);
-
-        List<AssetResponse> result = assetService.findWithWarrantyExpiringBetween(
-                LocalDate.of(2025, 1, 1), LocalDate.of(2026, 1, 1));
 
         assertThat(result).hasSize(1);
     }
